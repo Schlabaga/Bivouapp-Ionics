@@ -1,13 +1,71 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>profile</ion-title>
+    <ion-title>Profil</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">profile</ion-title>
+      <ion-title size="large">Profil</ion-title>
     </ion-toolbar>
   </ion-header>
+
+  <div class="profile-container" *ngIf="user">
+    <!-- Photo de profil -->
+    <div class="profile-header">
+      <div class="profile-pic-container">
+        <img [src]="user.profileImageUrl" [alt]="user.name">
+      </div>
+
+      <h2>{{ user.name }}</h2>
+      <p class="member-since">Membre depuis {{ getTimeAgo(user.createdAt) }}</p>
+    </div>
+
+    <!-- Liste des infos du profil -->
+    <ion-list class="profile-info">
+      <!-- Bio -->
+      <ion-item>
+        <ion-icon name="text-outline" slot="start"></ion-icon>
+        <ion-label>
+          <h3>Bio</h3>
+          <p>{{ user.bio }}</p>
+        </ion-label>
+      </ion-item>
+
+      <!-- Téléphone -->
+      <ion-item>
+        <ion-icon name="call-outline" slot="start"></ion-icon>
+        <ion-label>
+          <h3>Téléphone</h3>
+          <p>{{ user.phoneNumber }}</p>
+        </ion-label>
+      </ion-item>
+
+      <!-- Email -->
+      <ion-item>
+        <ion-icon name="mail-outline" slot="start"></ion-icon>
+        <ion-label>
+          <h3>E-mail</h3>
+          <p>{{ user.email }}</p>
+        </ion-label>
+      </ion-item>
+
+      <!-- Adresse -->
+      <ion-item>
+        <ion-icon name="location-outline" slot="start"></ion-icon>
+        <ion-label>
+          <h3>Adresse</h3>
+          <p>{{ user.address }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <!-- Bouton pour changer d'utilisateur (test) -->
+    <div class="actions">
+      <ion-button expand="block" color="secondary" (click)="changeUser()">
+        Changer d'utilisateur (test)
+      </ion-button>
+    </div>
+  </div>
 </ion-content>

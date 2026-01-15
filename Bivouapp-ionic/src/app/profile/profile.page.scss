@@ -1,0 +1,72 @@
+.profile-container {
+  padding: 0;
+}
+
+.profile-header {
+  text-align: center;
+  padding: 32px 16px;
+  background: var(--ion-color-light);
+
+  .profile-pic-container {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid var(--ion-color-primary);
+    margin: 0 auto 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      width: 100%;
+      height: 100%;
+      // pour pas étirer le visage
+      object-fit: cover;
+    }
+  }
+
+  h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: var(--ion-color-dark);
+  }
+
+  .member-since {
+    color: var(--ion-color-medium);
+    font-size: 14px;
+    margin: 0;
+  }
+}
+
+.profile-info {
+  padding: 0;
+
+  ion-item {
+    --padding-start: 16px;
+
+    ion-icon {
+      font-size: 24px;
+      margin-right: 16px;
+      color: var(--ion-color-primary);
+    }
+
+    ion-label {
+      h3 {
+        font-weight: 600;
+        color: var(--ion-color-dark);
+        margin-bottom: 4px;
+      }
+
+      p {
+        color: var(--ion-color-medium);
+        white-space: normal;
+      }
+    }
+  }
+}
+
+.actions {
+  padding: 24px 16px;
+}

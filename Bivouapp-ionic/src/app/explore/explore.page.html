@@ -1,17 +1,61 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Tab 1
-    </ion-title>
+    <ion-title>Explorer</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
+  <!-- Header qui se replie quand on scroll -->
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Tab 1</ion-title>
+      <ion-title size="large">Explorer</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <app-explore-container name="Tab 1 page"></app-explore-container>
+  <div class="explore-container">
+    <!-- Section des spots populaires -->
+    <div class="section">
+      <h2>Spots populaires</h2>
+      <ion-grid class="spots-grid">
+        <ion-row>
+          <ion-col
+            size="6"
+            size-md="3"
+            *ngFor="let spot of popularSpots">
+            <app-spot-card [spot]="spot"></app-spot-card>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </div>
+
+    <!-- Section des spots recommandés -->
+    <div class="section">
+      <h2>Recommandés près de vous</h2>
+      <ion-grid class="spots-grid">
+        <ion-row>
+          <ion-col
+            size="6"
+            size-md="3"
+            *ngFor="let spot of recommendedSpots">
+            <app-spot-card [spot]="spot"></app-spot-card>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </div>
+
+    <!-- Section de tous les spots -->
+    <div class="section">
+      <h2>Tous les spots</h2>
+      <ion-grid class="spots-grid">
+        <ion-row>
+          <ion-col
+            size="6"
+            size-md="3"
+            *ngFor="let spot of allSpots">
+            <app-spot-card [spot]="spot"></app-spot-card>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </div>
+  </div>
 </ion-content>

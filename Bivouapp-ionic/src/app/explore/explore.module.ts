@@ -4,8 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { ExplorePage } from './explore.page';
 import { ExplorePageRoutingModule } from './explore-routing.module';
-
-import { ExploreContainerComponentModule } from '../explore-container/explore-container.module';
+import { SpotCardComponent } from '../components/spot-card/spot-card.component';
 
 @NgModule({
   imports: [
@@ -13,7 +12,7 @@ import { ExploreContainerComponentModule } from '../explore-container/explore-co
     FormsModule,
     IonicModule,
     ExplorePageRoutingModule,
-    ExploreContainerComponentModule
+    SpotCardComponent
   ],
   declarations: [ExplorePage]
 })

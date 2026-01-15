@@ -1,15 +1,21 @@
+// Modèle pour les spots (bivouacs, campings, refuges, etc.)
 export interface Spot {
   id: number;
-  name: string;
-  image: string;
+  title: string;
+  description: string;
+  price: number;
   rating: number;
-  isFavorite?: boolean;
+  distance: number;
+  imageUrl: string;
+  services: string[];
+  isFavorite: boolean;
+  location: string;
+  type: string;
 }
 
-export interface RecommendedSpot {
-  id: number;
-  name: string;
-  image: string;
-  distance: string;
+// Service disponible pour un spot
+export interface Service {
+  id: string;
+  label: string;
+  icon: string;
 }
-

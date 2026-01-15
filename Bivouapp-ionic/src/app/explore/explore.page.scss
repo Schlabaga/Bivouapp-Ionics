@@ -1,0 +1,24 @@
+.explore-container {
+  padding: 16px;
+}
+
+.section {
+  margin-bottom: 32px;
+
+  h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--ion-color-dark);
+  }
+}
+
+.spots-grid {
+  padding: 0;
+
+  ion-row {
+    ion-col {
+      padding: 8px;
+    }
+  }
+}

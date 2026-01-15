@@ -1,13 +1,43 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>favorites</ion-title>
+    <ion-title>Mes favoris</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">favorites</ion-title>
+      <ion-title size="large">Mes favoris</ion-title>
     </ion-toolbar>
   </ion-header>
+
+  <div class="favorites-container">
+    <!-- Si il y a des favoris on les affiche -->
+    @if (favoriteSpots.length > 0) {
+      <ion-grid class="spots-grid">
+        <ion-row>
+          @for (spot of favoriteSpots; track spot.id) {
+            <ion-col size="6" size-md="3">
+              <app-spot-card
+                [spot]="spot"
+                [isFavoritePage]="true"
+                (removed)="handleRemove($event)">
+              </app-spot-card>
+            </ion-col>
+          }
+        </ion-row>
+      </ion-grid>
+    } @else {
+      <!-- Si pas de favori on affiche un message -->
+      <div class="empty-state">
+        <ion-icon name="heart-dislike-outline" color="medium"></ion-icon>
+        <h3>Aucun favori pour le moment</h3>
+        <p>Explorez les spots et ajoutez-les à vos favoris !</p>
+        <ion-button routerLink="/tabs/explore" expand="block">
+          Explorer les spots
+        </ion-button>
+      </div>
+    }
+
+  </div>
 </ion-content>

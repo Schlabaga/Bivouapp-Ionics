@@ -1,0 +1,105 @@
+.publish-container {
+  padding: 16px;
+}
+
+ion-item {
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  margin-bottom: 16px;
+
+  ion-label {
+    margin-bottom: 8px;
+  }
+}
+
+// Container pour les étoiles de notation
+.stars-container {
+  display: flex;
+  gap: 4px;
+  padding: 8px 0;
+
+  ion-button {
+    margin: 0;
+    --padding-start: 4px;
+    --padding-end: 4px;
+
+    ion-icon {
+      font-size: 28px;
+    }
+  }
+}
+
+// Section des services
+.services-section {
+  margin: 24px 0;
+
+  .section-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--ion-color-dark);
+  }
+}
+
+.services-grid {
+  padding: 0;
+
+  ion-row {
+    ion-col {
+      padding: 4px;
+    }
+  }
+}
+
+// Card de service cliquable
+.service-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 8px;
+  background: var(--ion-color-light);
+  border-radius: 12px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 80px;
+
+  ion-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+    color: var(--ion-color-medium);
+  }
+
+  p {
+    margin: 0;
+    font-size: 11px;
+    text-align: center;
+    color: var(--ion-color-medium);
+    font-weight: 500;
+  }
+
+  // Style quand le service est sélectionné
+  &.selected {
+    background: var(--ion-color-primary-tint);
+    border-color: var(--ion-color-primary);
+
+    ion-icon {
+      color: var(--ion-color-primary);
+    }
+
+    p {
+      color: var(--ion-color-primary);
+      font-weight: 600;
+    }
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.submit-section {
+  margin-top: 32px;
+  padding-bottom: 32px;
+}
