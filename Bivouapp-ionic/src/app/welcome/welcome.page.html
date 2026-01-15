@@ -1,13 +1,24 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>welcome</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" class="welcome-content">
+  <img src="/assets/images/bg.jpg" class="full-screen-bg" alt="background">
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">welcome</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <div class="content">
+    <header>
+      <h1>Bivouapp</h1>
+    </header>
+
+    <div class="bottom-group">
+      <div class="text-box">
+        <p>Trouvez les</p>
+        <h2>Meilleurs <br> Spots</h2>
+      </div>
+
+      <div class="button-group">
+        <ion-button expand="block" class="btn-primary">Se connecter</ion-button>
+        <ion-button expand="block" class="btn-secondary">S'inscrire</ion-button>
+        <ion-button expand="block" fill="clear" class="btn-link" routerLink="/tabs/explore">
+          Continuer sans compte
+        </ion-button>
+      </div>
+    </div>
+  </div>
 </ion-content>

@@ -5,7 +5,6 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <!-- Header qui se replie quand on scroll -->
   <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large">Explorer</ion-title>
@@ -18,12 +17,11 @@
       <h2>Spots populaires</h2>
       <ion-grid class="spots-grid">
         <ion-row>
-          <ion-col
-            size="6"
-            size-md="3"
-            *ngFor="let spot of popularSpots">
-            <app-spot-card [spot]="spot"></app-spot-card>
-          </ion-col>
+          @for (spot of popularSpots; track spot.id) {
+            <ion-col size="6" size-md="3">
+              <app-spot-card [spot]="spot"></app-spot-card>
+            </ion-col>
+          }
         </ion-row>
       </ion-grid>
     </div>
@@ -33,12 +31,11 @@
       <h2>Recommandés près de vous</h2>
       <ion-grid class="spots-grid">
         <ion-row>
-          <ion-col
-            size="6"
-            size-md="3"
-            *ngFor="let spot of recommendedSpots">
-            <app-spot-card [spot]="spot"></app-spot-card>
-          </ion-col>
+          @for (spot of recommendedSpots; track spot.id) {
+            <ion-col size="6" size-md="3">
+              <app-spot-card [spot]="spot"></app-spot-card>
+            </ion-col>
+          }
         </ion-row>
       </ion-grid>
     </div>
@@ -48,12 +45,11 @@
       <h2>Tous les spots</h2>
       <ion-grid class="spots-grid">
         <ion-row>
-          <ion-col
-            size="6"
-            size-md="3"
-            *ngFor="let spot of allSpots">
-            <app-spot-card [spot]="spot"></app-spot-card>
-          </ion-col>
+          @for (spot of allSpots; track spot.id) {
+            <ion-col size="6" size-md="3">
+              <app-spot-card [spot]="spot"></app-spot-card>
+            </ion-col>
+          }
         </ion-row>
       </ion-grid>
     </div>
