@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Spot } from '../models/spot.model';
 import { SpotsService } from '../services/spots';
 
@@ -12,33 +13,36 @@ export class FavoritesPage implements OnInit {
 
   favoriteSpots: Spot[] = [];
 
-  constructor(private spotsService: SpotsService) {}
+  constructor(
+    private spotsService: SpotsService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
+  }
+
+  ionViewWillEnter() {
     this.loadFavorites();
   }
 
-  // Chargement des favoris depuis le service
   loadFavorites() {
     this.spotsService.getSpots().subscribe({
       next: (spots) => {
-        // on filtre les favoris
-        this.favoriteSpots = spots.filter(spot => spot.isFavorite);
-        console.log( this.favoriteSpots);
+        // on prend juste ceux qui ont le coeur rouge
+        this.favoriteSpots = spots.filter(s => s.isFavorite);
       },
-      error: (err) => console.error('Erreur chargement favoris:', err)
+      error: (err) => console.error(err)
     });
   }
 
-  // Quand on retire un spot des favoris
-  handleRemove(spotId: number) {
-    console.log('Suppression du spot id:', spotId);
-    // on filtre le tableau pour que l'UI se mette à jour direct
-    this.favoriteSpots = this.favoriteSpots.filter(s => s.id !== spotId);
+  removeFavorite(spot: Spot) {
+    // on met à jour le service
+    this.spotsService.toggleFavorite(spot.id);
+
+    this.favoriteSpots = this.favoriteSpots.filter(s => s.id !== spot.id);
   }
 
-  // Refresh à chaque fois qu'on revient sur la page
-  ionViewWillEnter() {
-    this.loadFavorites();
+  openSpotDetail(id: number) {
+    this.router.navigate(['/tabs/spot-detail', id]);
   }
 }

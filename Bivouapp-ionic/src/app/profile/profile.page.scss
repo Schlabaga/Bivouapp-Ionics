@@ -1,72 +1,106 @@
-.profile-container {
-  padding: 0;
+ion-content {
+  --background: #fff;
 }
 
-.profile-header {
-  text-align: center;
-  padding: 32px 16px;
-  background: var(--ion-color-light);
+.main-container {
+  padding: 20px;
+  padding-bottom: 40px;
+}
 
-  .profile-pic-container {
+/* Titre MON PROFIL */
+.page-title {
+  font-size: 32px;
+  font-weight: 400; /* Un peu fin comme sur ton image */
+  margin-top: 20px;
+  margin-bottom: 30px;
+  color: #000;
+}
+
+/* Header avec la photo */
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+
+  .avatar-circle {
     width: 120px;
     height: 120px;
     border-radius: 50%;
     overflow: hidden;
-    border: 4px solid var(--ion-color-primary);
-    margin: 0 auto 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: #F6F8FC;
+    margin-bottom: 15px;
 
     img {
       width: 100%;
       height: 100%;
-      // pour pas étirer le visage
       object-fit: cover;
     }
   }
 
   h2 {
-    font-size: 24px;
-    font-weight: 600;
-    margin: 0 0 8px 0;
-    color: var(--ion-color-dark);
-  }
-
-  .member-since {
-    color: var(--ion-color-medium);
-    font-size: 14px;
     margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: #000;
+  }
+
+  .since {
+    margin-top: 5px;
+    color: #888;
+    font-size: 14px;
   }
 }
 
-.profile-info {
-  padding: 0;
+/* Les blocs d'infos */
+.info-group {
+  margin-bottom: 20px;
 
-  ion-item {
-    --padding-start: 16px;
-
-    ion-icon {
-      font-size: 24px;
-      margin-right: 16px;
-      color: var(--ion-color-primary);
-    }
-
-    ion-label {
-      h3 {
-        font-weight: 600;
-        color: var(--ion-color-dark);
-        margin-bottom: 4px;
-      }
-
-      p {
-        color: var(--ion-color-medium);
-        white-space: normal;
-      }
-    }
+  label {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 8px;
+    padding-left: 5px;
   }
 }
 
-.actions {
-  padding: 24px 16px;
+.info-box {
+  background: #F6F8FC; /* Le fameux gris clair */
+  border-radius: 12px;
+  padding: 15px;
+  display: flex;
+  align-items: flex-start; /* Pour aligner en haut si le texte est long */
+  gap: 15px;
+  min-height: 55px;
+
+  ion-icon {
+    font-size: 22px;
+    color: #9CA3AF;
+    margin-top: 2px;
+  }
+
+  span {
+    color: #000; /* Texte bien noir */
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+}
+
+/* Bouton */
+.action-btn {
+  margin-top: 20px;
+  --background: #2f65e8;
+  --border-radius: 12px;
+  height: 50px;
+  color: white;
+  font-weight: 600;
+  text-transform: none;
+}
+
+.loading {
+  text-align: center;
+  margin-top: 50px;
 }

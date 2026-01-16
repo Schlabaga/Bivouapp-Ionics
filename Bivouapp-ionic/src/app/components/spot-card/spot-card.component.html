@@ -1,48 +1,42 @@
-<ion-card class="spot-card" [routerLink]="['/tabs/spot-detail', spot.id]">
-  <div class="image-container">
-    <img [src]="spot.imageUrl" [alt]="spot.title" class="spot-image">
+<div class="card-container" (click)="onCardClick()">
+  <div class="image-wrapper">
+    <img [src]="spot.imageUrl" class="spot-img">
 
-    <ion-button
-      fill="clear"
-      class="favorite-btn"
-      (click)="onFavoriteClick($event)">
+    <div class="fav-btn" (click)="onToggleFavorite($event)">
       <ion-icon
         [name]="spot.isFavorite ? 'heart' : 'heart-outline'"
-        [color]="spot.isFavorite ? 'danger' : 'medium'">
+        [color]="spot.isFavorite ? 'danger' : 'light'">
       </ion-icon>
-    </ion-button>
-  </div>
-
-  <ion-card-content class="spot-info">
-    <div class="header-row">
-      <ion-text class="location">{{ spot.location }}</ion-text>
-      <ion-text class="rating">
-        <ion-icon name="star" color="warning"></ion-icon>
-        {{ spot.rating }}
-      </ion-text>
     </div>
 
-    <ion-text class="title">
-      <h3>{{ spot.title }}</h3>
-    </ion-text>
+    <div class="distance-badge">
+      {{ spot.distance }} km
+    </div>
+  </div>
 
-    <ion-text class="dates" color="medium">
-      <p>15 - 20 juil.</p>
-    </ion-text>
+  <div class="info-content">
+    <h3 class="title">{{ spot.title }}</h3>
 
-    @if (spot.price > 0) {
-      <ion-text class="price">
-        <p>
-          <strong>{{ spot.price | currency: 'EUR' }}</strong>
-          @if (spot.type !== "point d'eau") {
-            <span> par nuit</span>
-          }
-        </p>
-      </ion-text>
-    } @else if (spot.price === 0) {
-      <ion-text class="free" color="success">
-        <p><strong>Gratuit</strong></p>
-      </ion-text>
-    }
-  </ion-card-content>
-</ion-card>
+    <div class="tag-row">
+      <ion-icon name="trending-up-outline" color="primary"></ion-icon>
+      <span>Incontournable</span>
+    </div>
+
+    <div class="rating-row">
+      @for (star of [1,2,3,4,5]; track star) {
+        <ion-icon
+          [name]="spot.rating >= star ? 'star' : 'star-outline'"
+          class="star-icon">
+        </ion-icon>
+      }
+    </div>
+
+    <div class="price-row">
+      @if (spot.price > 0) {
+        <span class="price">{{ spot.price }} €</span>
+      } @else {
+        <span class="price free">Gratuit</span>
+      }
+    </div>
+  </div>
+</div>

@@ -1,24 +1,198 @@
-.explore-container {
-  padding: 16px;
+ion-content {
+  --background: #fff;
 }
 
-.section {
-  margin-bottom: 32px;
+.main-container {
+  /* Pour pas que le menu du bas cache le contenu */
+  padding: 20px 20px 80px;
+}
 
-  h2 {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 16px;
-    color: var(--ion-color-dark);
+/* Titre ALPES */
+.header-title {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  span {
+    color: #666;
+    font-size: 14px;
+  }
+  h1 {
+    margin: 0;
+    font-size: 40px;
+    font-weight: 400; /* Un peu fin comme sur l'image */
+    color: #000;
   }
 }
 
-.spots-grid {
-  padding: 0;
+/* Recherche */
+.custom-search {
+  --background: #F6F8FC;
+  --border-radius: 12px;
+  --box-shadow: none;
+  --placeholder-color: ;
+  padding-inline-start: 0;
+  padding-inline-end: 0;
+  margin-bottom: 20px;
+}
 
-  ion-row {
-    ion-col {
-      padding: 8px;
+/* Menu catégories scrollable */
+.categories-scroll {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+
+  /* Pour cacher la barre de scroll */
+  &::-webkit-scrollbar { display: none; }
+
+  .category-item {
+    cursor: pointer;
+    font-size: 16px;
+    color: #aaa;
+    white-space: nowrap;
+    font-weight: 500;
+
+    &.active {
+      color: #2f65e8; /* Bleu */
+      font-weight: 700;
+      border-bottom: 2px solid #2f65e8; /* Petit trait bleu  */
     }
+  }
+}
+
+/* Sections */
+.section {
+  margin-bottom: 30px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+
+  h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #000;
+    margin: 0;
+  }
+
+  .see-all {
+    color: #2f65e8;
+    font-size: 14px;
+  }
+}
+
+/* LE SCROLL HORIZONTAL DES CARTES */
+.horizontal-scroll {
+  display: flex;
+  gap: 15px;
+  overflow-x: auto;
+  padding-right: 20px;
+  &::-webkit-scrollbar { display: none; }
+}
+
+/* LA CARTE */
+.spot-card {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  flex-shrink: 0; /* Important pour pas qu'elles s'écrasent */
+
+  &.big {
+    width: 220px;
+    height: 280px;
+  }
+
+  &.medium {
+    width: 200px;
+    height: 140px;
+  }
+
+  .bg-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+/* TEXTE SUR L'IMAGE */
+.card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; /* Tout en bas */
+
+  /* Dégradé léger pour lire le texte */
+  background: linear-gradient(to top, rgba(0,0,0,0.4), transparent);
+
+  .badges-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 8px;
+  }
+
+  .name-badge {
+    background: rgba(60, 60, 60, 0.85); /* Gris foncé transp */
+    color: white;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .fav-badge {
+    background: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+  }
+
+  .rating-badge {
+    align-self: flex-start; /* Calé à gauche */
+    background: rgba(60, 60, 60, 0.85);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    ion-icon { font-size: 12px; }
+  }
+}
+
+/* Style spécifique pour la 2eme section (Recommandé) */
+.card-overlay.bottom {
+  justify-content: flex-end;
+  align-items: flex-start;
+  gap: 5px;
+
+  .dist-badge {
+    background: rgba(0,0,0,0.6);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-size: 10px;
+  }
+
+  .name-badge.simple {
+    background: transparent;
+    padding: 0;
+    font-size: 16px;
+    font-weight: bold;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
   }
 }

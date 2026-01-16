@@ -1,8 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-import { IonicModule } from '@ionic/angular';
+import {IonicModule} from '@ionic/angular';
 
 import { SpotDetailPageRoutingModule } from './spot-detail-routing.module';
 
@@ -13,7 +12,7 @@ import { SpotDetailPage } from './spot-detail.page';
     CommonModule,
     FormsModule,
     IonicModule,
-    SpotDetailPageRoutingModule
+    SpotDetailPageRoutingModule,
   ],
   declarations: [SpotDetailPage]
 })

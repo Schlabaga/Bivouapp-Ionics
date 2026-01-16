@@ -1,57 +1,95 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Explorer</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Explorer</ion-title>
-    </ion-toolbar>
-  </ion-header>
 
-  <div class="explore-container">
-    <!-- Section des spots populaires -->
-    <div class="section">
-      <h2>Spots populaires</h2>
-      <ion-grid class="spots-grid">
-        <ion-row>
+  <div class="main-container">
+    <div class="header-title">
+      <span>Explorez</span>
+      <h1>Alpes</h1>
+    </div>
+
+    <div class="search-section">
+      <ion-searchbar placeholder="Rechercher un spot" class="custom-search"></ion-searchbar>
+    </div>
+
+    <div class="categories-scroll">
+      @for (cat of categories; track cat.id) {
+        <div class="category-item"
+             [class.active]="selectedCategory === cat.id"
+             (click)="selectCategory(cat.id)">
+          {{ cat.label }}
+        </div>
+      }
+    </div>
+
+    @if (selectedCategory === 'feed') {
+
+      <div class="section">
+        <div class="section-header">
+          <h2>Populaire</h2>
+        </div>
+
+        <div class="horizontal-scroll">
           @for (spot of popularSpots; track spot.id) {
-            <ion-col size="6" size-md="3">
-              <app-spot-card [spot]="spot"></app-spot-card>
-            </ion-col>
+            <div class="spot-card big" (click)="openSpotDetail(spot.id)">
+              <img [src]="spot.imageUrl" class="bg-img">
+              <div class="card-overlay">
+                <div class="badges-row">
+                  <div class="name-badge">{{ spot.title }}</div>
+                  <div class="fav-badge">
+                    <ion-icon [name]="spot.isFavorite ? 'heart' : 'heart-outline'"
+                              [color]="spot.isFavorite ? 'danger' : 'medium'"></ion-icon>
+                  </div>
+                </div>
+                <div class="rating-badge">
+                  <ion-icon name="star" color="warning"></ion-icon>
+                  <span>{{ spot.rating }}</span>
+                </div>
+              </div>
+            </div>
           }
-        </ion-row>
-      </ion-grid>
-    </div>
+        </div>
+      </div>
 
-    <!-- Section des spots recommandés -->
-    <div class="section">
-      <h2>Recommandés près de vous</h2>
-      <ion-grid class="spots-grid">
-        <ion-row>
+      <div class="section">
+        <div class="section-header">
+          <h2>Recommandé</h2>
+        </div>
+
+        <div class="horizontal-scroll">
           @for (spot of recommendedSpots; track spot.id) {
-            <ion-col size="6" size-md="3">
-              <app-spot-card [spot]="spot"></app-spot-card>
-            </ion-col>
+            <div class="spot-card medium" (click)="openSpotDetail(spot.id)">
+              <img [src]="spot.imageUrl" class="bg-img">
+              <div class="card-overlay bottom">
+                <div class="dist-badge">{{ spot.distance }} km</div>
+                <div class="name-badge simple">{{ spot.title }}</div>
+              </div>
+            </div>
           }
-        </ion-row>
-      </ion-grid>
-    </div>
+        </div>
+      </div>
 
-    <!-- Section de tous les spots -->
-    <div class="section">
-      <h2>Tous les spots</h2>
-      <ion-grid class="spots-grid">
-        <ion-row>
-          @for (spot of allSpots; track spot.id) {
-            <ion-col size="6" size-md="3">
-              <app-spot-card [spot]="spot"></app-spot-card>
-            </ion-col>
-          }
-        </ion-row>
-      </ion-grid>
-    </div>
+    } @else {
+      <div class="section-header">
+        <h2>{{ selectedCategory | titlecase }}</h2> </div>
+
+      @if (filteredSpots.length > 0) {
+        <ion-grid class="spots-grid">
+          <ion-row>
+            @for (spot of filteredSpots; track spot.id) {
+              <ion-col size="6" size-md="3">
+                <app-spot-card
+                  [spot]="spot"
+                  (clicked)="openSpotDetail(spot.id)"
+                  (favoriteToggled)="toggleFavorite(spot)"> </app-spot-card>
+              </ion-col>
+            }
+          </ion-row>
+        </ion-grid>
+      } @else {
+        <div class="empty-state">
+          <p>Aucun spot trouvé dans cette catégorie pour le moment !</p>
+        </div>
+      }
+    }
+
   </div>
 </ion-content>

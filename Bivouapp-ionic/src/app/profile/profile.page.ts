@@ -15,41 +15,27 @@ export class ProfilePage implements OnInit {
   constructor(private usersService: UsersService) {}
 
   ngOnInit() {
-    // On charge l'utilisateur 1 par défaut
     this.user = this.usersService.getUserById(1);
   }
 
-  // Fonction pour changer d'utilisateur (pour tester)
   changeUser() {
     if (this.user) {
-      let newId: number;
-
-      // Si on est pas au dernier user, on prend le suivant
-      if (this.user.id < 5) {
-        newId = this.user.id + 1;
-      } else {
-        // Sinon on revient au premier
-        newId = 1;
-      }
-
+      let newId = (this.user.id < 5) ? this.user.id + 1 : 1;
       this.user = this.usersService.getUserById(newId);
     }
   }
 
-  // Fonction pour afficher le temps écoulé depuis la création
   getTimeAgo(date: Date): string {
     const now = new Date();
-    const diffTime = Math.abs(now.getTime() - date.getTime());
+    // Petite sécu si la date est une string qui vient d'une API
+    const created = new Date(date);
+    const diffTime = Math.abs(now.getTime() - created.getTime());
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays < 30) {
-      return `${diffDays} jours`;
-    } else if (diffDays < 365) {
-      const months = Math.floor(diffDays / 30);
-      return `${months} mois`;
-    } else {
-      const years = Math.floor(diffDays / 365);
-      return `${years} an${years > 1 ? 's' : ''}`;
-    }
+    if (diffDays < 30) return `${diffDays} jours`;
+    if (diffDays < 365) return `${Math.floor(diffDays / 30)} mois`;
+
+    const years = Math.floor(diffDays / 365);
+    return `${years} an${years > 1 ? 's' : ''}`;
   }
 }

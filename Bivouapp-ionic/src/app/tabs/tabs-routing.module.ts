@@ -24,6 +24,10 @@ const routes: Routes = [
         loadChildren: () => import('../profile/profile.module').then(m => m.ProfilePageModule)
       },
       {
+        path: 'spot-detail/:id',
+        loadChildren: () => import('../spot-detail/spot-detail.module').then(m => m.SpotDetailPageModule)
+      },
+      {
         path: '',
         redirectTo: '/tabs/explore',
         pathMatch: 'full'

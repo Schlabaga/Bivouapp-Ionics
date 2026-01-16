@@ -1,0 +1,197 @@
+/* On vire le padding par défaut pour que l'image colle aux bords */
+ion-content {
+  --background: #fff;
+}
+
+.hero-container {
+  position: relative;
+  height: 350px; /* Grande image */
+  width: 100%;
+}
+
+.hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* LES BOUTONS FLOTTANTS (Le carré blanc et le rond blanc) */
+.header-buttons {
+  position: absolute;
+  top: 50px; /* Ajuste selon la "safe area" de l'iPhone */
+  left: 20px;
+  right: 20px;
+  display: flex;
+  justify-content: space-between;
+  z-index: 10;
+}
+
+.nav-btn {
+  --background: rgba(255, 255, 255, 0.9);
+  --padding-start: 0;
+  --padding-end: 0;
+  width: 45px;
+  height: 45px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  --color: #000;
+}
+
+.back-btn {
+  border-radius: 12px; /* Carré arrondi à gauche */
+}
+
+.fav-btn {
+  border-radius: 50%; /* Rond parfait à droite */
+}
+
+/* LE CONTENU SOUS L'IMAGE */
+.detail-container {
+  padding: 20px;
+  border-radius: 30px 30px 0 0; /* L'arrondi qui remonte sur l'image */
+  background: white;
+  margin-top: -30px; /* On fait chevaucher l'image */
+  position: relative;
+  z-index: 5;
+}
+
+.title-section {
+  margin-bottom: 20px;
+
+  .top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h1 {
+      font-size: 24px;
+      font-weight: 800;
+      margin: 0;
+      color: #1a1a1a;
+      max-width: 70%;
+    }
+
+    .map-link {
+      font-size: 14px;
+      font-weight: 700;
+      --color: #2f65e8;
+      text-transform: none;
+    }
+  }
+
+  .rating-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 8px;
+    color: #666;
+    font-size: 14px;
+
+    ion-icon {
+      font-size: 16px;
+    }
+  }
+}
+
+/* MAP CACHÉE / VISIBLE */
+.map-container {
+  height: 0;
+  overflow: hidden;
+  transition: height 0.3s ease;
+
+  &.visible {
+    height: 200px; /* Hauteur de la carte quand ouverte */
+    margin-bottom: 20px;
+    border-radius: 15px;
+  }
+}
+#mini-map { width: 100%; height: 100%; border-radius: 15px; }
+
+.description-text {
+  color: #666;
+  line-height: 1.5;
+  font-size: 15px;
+
+  .read-more {
+    color: #2f65e8;
+    font-weight: 600;
+    display: block; /* Force le passage à la ligne ou inline-block */
+    margin-top: 5px;
+  }
+}
+
+/* LES SERVICES (GRILLE DE CARRÉS) */
+.services-section {
+  margin-top: 25px;
+
+  h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 15px;
+  }
+
+  .services-grid {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto; /* Scroll horizontal si y'en a trop */
+    padding-bottom: 10px;
+
+    /* On cache la barre de scroll moche */
+    &::-webkit-scrollbar { display: none; }
+  }
+
+  .service-card {
+    min-width: 100px;
+    height: 100px;
+    background: #F8F9FE; /* Gris très clair bleuté */
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    color: #9CA3AF; /* Gris icône */
+
+    ion-icon {
+      font-size: 28px;
+    }
+
+    span {
+      font-size: 12px;
+      font-weight: 500;
+      text-align: center;
+    }
+  }
+}
+
+/* LE FOOTER (PRIX ET BOUTON) */
+ion-footer {
+  background: white;
+  box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+  padding: 10px 20px 30px 20px; /* Un peu de marge en bas pour les iPhone récents */
+
+  .footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .price-info {
+    display: flex;
+    flex-direction: column;
+
+    .label { font-size: 12px; color: #666; }
+    .value { font-size: 22px; font-weight: 800; color: #1a1a1a; }
+    .value.free { color: #2DD36F; /* Vert "Gratuit" */ }
+  }
+
+  .action-btn {
+    --border-radius: 12px;
+    width: 60%;
+    height: 50px;
+    font-weight: 700;
+    font-size: 16px;
+    color: white;
+    --background: #2f65e8; /* Ton bleu */
+    text-transform: none;
+  }
+}

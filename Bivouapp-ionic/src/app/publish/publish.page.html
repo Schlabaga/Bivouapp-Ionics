@@ -1,7 +1,7 @@
-<ion-header [translucent]="true">
+<ion-header class="ion-no-border">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/explore"></ion-back-button>
+      <ion-back-button defaultHref="/tabs/explore" text="" icon="chevron-back"></ion-back-button>
     </ion-buttons>
     <ion-title>Publier un spot</ion-title>
   </ion-toolbar>
@@ -9,86 +9,80 @@
 
 <ion-content [fullscreen]="true">
   <div class="publish-container">
-    <!-- Formulaire avec FormGroup -->
     <form [formGroup]="spotForm" (ngSubmit)="onSubmit()">
 
-      <!-- Titre -->
-      <ion-item>
-        <ion-label position="stacked">Titre *</ion-label>
-        <ion-input
-          type="text"
-          formControlName="title"
-          placeholder="Ajouter un titre">
-        </ion-input>
-      </ion-item>
+      <div class="input-group">
+        <label>Titre</label>
+        <ion-input class="custom-input" formControlName="title" placeholder="Ajouter un titre"></ion-input>
+      </div>
 
-      <!-- Description -->
-      <ion-item>
-        <ion-label position="stacked">Description *</ion-label>
-        <ion-textarea
-          formControlName="description"
-          placeholder="Ajouter une description..."
-          rows="4">
-        </ion-textarea>
-      </ion-item>
+      <div class="input-group">
+        <label>Description</label>
+        <ion-textarea class="custom-input" formControlName="description" placeholder="Ajouter une description..." rows="4"></ion-textarea>
+      </div>
 
-      <!-- Note (étoiles) -->
-      <ion-item>
-        <ion-label position="stacked">Note</ion-label>
-        <div class="stars-container">
-          <ion-button
-            *ngFor="let s of [1, 2, 3, 4, 5]"
-            fill="clear"
-            size="small"
-            (click)="setRating(s)">
-            <ion-icon
-              [name]="spotForm.get('rating')?.value >= s ? 'star' : 'star-outline'"
-              [color]="spotForm.get('rating')?.value >= s ? 'warning' : 'medium'">
-            </ion-icon>
-          </ion-button>
+      <div class="input-group">
+        <label>Localisation</label>
+        <div class="map-wrapper">
+          <div id="map-publish"></div>
+          <div class="map-overlay">
+            <ion-icon name="location"></ion-icon>
+            <span>{{ spotForm.get('latitude')?.value | number:'1.2-2' }}, {{ spotForm.get('longitude')?.value | number:'1.2-2' }}</span>
+          </div>
         </div>
-      </ion-item>
-
-      <!-- Prix -->
-      <ion-item>
-        <ion-label position="stacked">Prix (€)</ion-label>
-        <ion-input
-          type="number"
-          formControlName="price"
-          placeholder="0">
-        </ion-input>
-      </ion-item>
-
-      <!-- Services -->
-      <div class="services-section">
-        <ion-label class="section-label">Services</ion-label>
-        <ion-grid class="services-grid">
-          <ion-row>
-            <ion-col
-              size="4"
-              size-md="2"
-              *ngFor="let service of allServices">
-              <div
-                class="service-item"
-                [class.selected]="isServiceSelected(service.id)"
-                (click)="toggleService(service.id)">
-                <ion-icon [name]="service.icon"></ion-icon>
-                <p>{{ service.label }}</p>
-              </div>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
       </div>
 
-      <!-- Bouton de soumission -->
-      <div class="submit-section">
-        <ion-button
-          expand="block"
-          type="submit"
-          [disabled]="spotForm.invalid">
-          Publier le spot
-        </ion-button>
+      <ion-row>
+        <ion-col size="6">
+          <div class="input-group">
+            <label>Note</label>
+            <div class="stars-row">
+              <ion-icon *ngFor="let s of [1,2,3,4,5]"
+                        [name]="spotForm.get('rating')?.value >= s ? 'star' : 'star-outline'"
+                        [class.active]="spotForm.get('rating')?.value >= s"
+                        (click)="setRating(s)"></ion-icon>
+            </div>
+          </div>
+        </ion-col>
+        <ion-col size="6">
+          <div class="input-group">
+            <label>Prix</label>
+            <div class="price-input-wrapper">
+              <ion-input type="number" formControlName="price" placeholder="Prix"></ion-input>
+              <span class="currency">€</span>
+            </div>
+          </div>
+        </ion-col>
+      </ion-row>
+
+      <div class="input-group">
+        <label>Services</label>
+        <div class="services-scroll">
+          <div class="service-box"
+               *ngFor="let service of allServices"
+               [class.selected]="isServiceSelected(service.id)"
+               (click)="toggleService(service.id)">
+            <ion-icon [name]="service.icon"></ion-icon>
+            <span>{{ service.label }}</span>
+          </div>
+        </div>
       </div>
+
+      <div class="input-group">
+        <div class="media-header">
+          <ion-icon name="add-circle-outline"></ion-icon>
+          <span>Ajouter médias</span>
+        </div>
+        <div class="media-preview">
+          <div class="img-box add"><ion-icon name="camera"></ion-icon></div>
+          <div class="img-box"><img src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=200"></div>
+        </div>
+      </div>
+
+      <ion-button expand="block" type="submit" class="submit-btn" [disabled]="spotForm.invalid">
+        Publier le spot
+      </ion-button>
+
     </form>
   </div>
 </ion-content>

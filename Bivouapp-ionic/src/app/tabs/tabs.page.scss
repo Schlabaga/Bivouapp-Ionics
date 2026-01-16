@@ -1,1 +1,31 @@
+ion-tab-bar {
+  --background: #ffffff;
+  border-top: 1px solid #f0f0f0; /* ligne subtile en haut pour séparer */
+  height: 60px;
 
+  position: relative;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  border-radius: 10px;
+}
+
+ion-tab-button {
+  --background: #ffffff;
+  --color: #C5C5C5; /* gris clair quand c'est pas actif */
+
+  ion-icon {
+    font-size: 26px;
+    transition: transform 0.2s ease, color 0.2s ease; /* animation  */
+  }
+}
+
+/* actif */
+.tab-selected {
+  --color: #2f65e8;
+
+  ion-icon {
+    transform: scale(1.2); /* on grossit l'icône de 20% */
+  }
+}

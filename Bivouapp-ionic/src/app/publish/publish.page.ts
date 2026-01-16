@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { SpotsService } from '../services/spots';
 import { Service } from '../models/spot.model';
+import * as L from 'leaflet';
 
 @Component({
   selector: 'app-publish',
@@ -13,9 +14,10 @@ import { Service } from '../models/spot.model';
 })
 export class PublishPage implements OnInit {
 
-  // FormGroup permet de gérer un formulaire avec plusieurs champs
   spotForm!: FormGroup;
   allServices: Service[] = [];
+  map: L.Map | undefined;
+  marker: L.Marker | undefined;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -25,86 +27,125 @@ export class PublishPage implements OnInit {
   ) {}
 
   ngOnInit() {
-    // On récupère tous les services disponibles
     this.allServices = this.spotsService.getAllServices();
 
-    // Construction du formulaire avec FormBuilder
     this.spotForm = this.formBuilder.group({
-      title: ['', [Validators.required]], // Champ obligatoire
+      title: ['', [Validators.required]],
       description: ['', [Validators.required]],
-      location: ['Sallanches'],
-      rating: [4, [Validators.min(1), Validators.max(5)]], // Entre 1 et 5
-      price: [0, [Validators.min(0)]], // Prix positif
-      services: [[]], // Tableau vide par défaut
-      imageUrl: ['https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=600'],
+      location: ['Spot inconnu'], // L'utilisateur peut changer ça
+      longitude: [0, [Validators.required]],
+      latitude: [0, [Validators.required]],
+      rating: [4],
+      price: [null], // Null pour afficher le placeholder
+      services: [[]],
+      imageUrl: ['https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=600'], // Image par défaut
       type: 'bivouac',
       isFavorite: false
     });
   }
 
-  // Change la note du spot
+  // On charge la carte quand la page s'affiche
+  ionViewDidEnter() {
+    this.initMap();
+  }
+
+  initMap() {
+    // Si la carte existe déjà, on touche à rien (sinon ça bug)
+    if (this.map) return;
+
+    // On centre sur la France ou Sallanches par défaut
+    const defaultLat = 45.9366;
+    const defaultLng = 6.6300;
+
+    this.map = L.map('map-publish', {
+      zoomControl: false // On vire les boutons zoom pour le style
+    }).setView([defaultLat, defaultLng], 12);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: ''
+    }).addTo(this.map);
+
+    // On crée une icône perso (sinon Leaflet bug parfois avec Angular)
+    const icon = L.icon({
+      iconUrl: 'assets/icon/favicon.png', // Mets ton icône ici
+      iconSize: [30, 30],
+      iconAnchor: [15, 15]
+    });
+
+    // On ajoute un marqueur qu'on peut bouger (draggable: true)
+    this.marker = L.marker([defaultLat, defaultLng], {
+      icon: icon,
+      draggable: true
+    }).addTo(this.map);
+
+    // On met à jour le formulaire par défaut
+    this.updateCoordinates(defaultLat, defaultLng);
+
+    // QUAND ON BOUGE LE MARQUEUR
+    this.marker.on('dragend', () => {
+      const position = this.marker!.getLatLng();
+      this.updateCoordinates(position.lat, position.lng);
+      console.log("Nouvelle position : ", position);
+    });
+  }
+
+  updateCoordinates(lat: number, lng: number) {
+    this.spotForm.patchValue({
+      latitude: lat,
+      longitude: lng
+    });
+  }
+
   setRating(rating: number) {
     this.spotForm.get('rating')?.setValue(rating);
   }
 
-  // Vérifie si un service est sélectionné
   isServiceSelected(serviceId: string): boolean {
     const services = this.spotForm.get('services')?.value as string[];
     return services.includes(serviceId);
   }
 
-  // Ajoute ou retire un service de la liste sélectionnée
   toggleService(serviceId: string): void {
-    // On récupère le tableau actuel des services cochés
     const currentServices = this.spotForm.get('services')?.value as string[];
-
-    // Si le service est déjà dans la liste on l'enlève
     if (currentServices.includes(serviceId)) {
-      const newServices = currentServices.filter(id => id !== serviceId);
-      this.spotForm.get('services')?.setValue(newServices);
+      this.spotForm.get('services')?.setValue(currentServices.filter(id => id !== serviceId));
     } else {
-      // Sinon on l'ajoute
       currentServices.push(serviceId);
       this.spotForm.get('services')?.setValue(currentServices);
     }
   }
 
   async onSubmit() {
-    // On vérifie que le formulaire est valide (tous les Validators sont OK)
     if (this.spotForm.valid) {
-      // On crée un nouvel objet spot en prenant toutes les valeurs du formulaire
       const newSpot = {
-        ...this.spotForm.value, // Le spread operator copie tous les champs
-        id: Date.now(), // ID unique basé sur le timestamp
-        distance: 0,
-        isFavorite: false
+        ...this.spotForm.value,
+        id: Date.now(),
+        distance: 0, // Calculera plus tard
+        price: this.spotForm.value.price || 0 // Si vide = 0 (Gratuit)
       };
 
-      // On ajoute le spot au service
       this.spotsService.addSpot(newSpot);
-      console.log('Spot ajouté:', newSpot);
 
-      // On affiche un message de confirmation
       const toast = await this.toastController.create({
-        message: 'Spot publié avec succès !',
+        message: 'Spot publié avec succès mon gaté !',
         duration: 2000,
         color: 'success',
         position: 'bottom'
       });
       await toast.present();
 
-      // On réinitialise le formulaire et on redirige vers explore
-      this.spotForm.reset({
-        location: 'Sallanches',
-        rating: 4,
-        price: 0,
-        services: [],
-        imageUrl: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=600',
-        type: 'bivouac',
-        isFavorite: false
-      });
+      this.router.navigate(['/tabs/explore']);
 
-      await this.router.navigate(['/tabs/explore']);
+      // reset
+      this.spotForm.reset();
+    } else {
+      // Si formulaire invalide
+      const toast = await this.toastController.create({
+        message: 'Il manque des infos ! Vérifie le titre et la carte.',
+        duration: 2000,
+        color: 'warning'
+      });
+      await toast.present();
     }
   }
 }

@@ -1,4 +1,3 @@
-// Modèle pour les spots (bivouacs, campings, refuges, etc.)
 export interface Spot {
   id: number;
   title: string;
@@ -11,8 +10,9 @@ export interface Spot {
   isFavorite: boolean;
   location: string;
   type: string;
+  latitude: number;
+  longitude: number;
 }
-
 // Service disponible pour un spot
 export interface Service {
   id: string;

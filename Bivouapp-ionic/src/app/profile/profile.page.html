@@ -1,71 +1,65 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Profil</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Profil</ion-title>
-    </ion-toolbar>
-  </ion-header>
 
-  <div class="profile-container" *ngIf="user">
-    <!-- Photo de profil -->
-    <div class="profile-header">
-      <div class="profile-pic-container">
-        <img [src]="user.profileImageUrl" [alt]="user.name">
+  <div class="main-container">
+
+    <h1 class="page-title">Mon profil</h1>
+
+    @if (user) {
+      <div class="profile-header">
+        <div class="avatar-circle">
+          <img [src]="user.profileImageUrl" [alt]="user.name">
+        </div>
+        <h2>{{ user.name }}</h2>
+        <p class="since">Membre depuis {{ getTimeAgo(user.createdAt) }}</p>
       </div>
 
-      <h2>{{ user.name }}</h2>
-      <p class="member-since">Membre depuis {{ getTimeAgo(user.createdAt) }}</p>
-    </div>
+      <div class="info-section">
 
-    <!-- Liste des infos du profil -->
-    <ion-list class="profile-info">
-      <!-- Bio -->
-      <ion-item>
-        <ion-icon name="text-outline" slot="start"></ion-icon>
-        <ion-label>
-          <h3>Bio</h3>
-          <p>{{ user.bio }}</p>
-        </ion-label>
-      </ion-item>
+        <div class="info-group">
+          <label>Bio</label>
+          <div class="info-box">
+            <ion-icon name="text-outline"></ion-icon>
+            <span>{{ user.bio }}</span>
+          </div>
+        </div>
 
-      <!-- Téléphone -->
-      <ion-item>
-        <ion-icon name="call-outline" slot="start"></ion-icon>
-        <ion-label>
-          <h3>Téléphone</h3>
-          <p>{{ user.phoneNumber }}</p>
-        </ion-label>
-      </ion-item>
+        <div class="info-group">
+          <label>Téléphone</label>
+          <div class="info-box">
+            <ion-icon name="call-outline"></ion-icon>
+            <span>{{ user.phoneNumber }}</span>
+          </div>
+        </div>
 
-      <!-- Email -->
-      <ion-item>
-        <ion-icon name="mail-outline" slot="start"></ion-icon>
-        <ion-label>
-          <h3>E-mail</h3>
-          <p>{{ user.email }}</p>
-        </ion-label>
-      </ion-item>
+        <div class="info-group">
+          <label>E-mail</label>
+          <div class="info-box">
+            <ion-icon name="mail-outline"></ion-icon>
+            <span>{{ user.email }}</span>
+          </div>
+        </div>
 
-      <!-- Adresse -->
-      <ion-item>
-        <ion-icon name="location-outline" slot="start"></ion-icon>
-        <ion-label>
-          <h3>Adresse</h3>
-          <p>{{ user.address }}</p>
-        </ion-label>
-      </ion-item>
-    </ion-list>
+        <div class="info-group">
+          <label>Adresse</label>
+          <div class="info-box">
+            <ion-icon name="location-outline"></ion-icon>
+            <span>{{ user.address }}</span>
+          </div>
+        </div>
 
-    <!-- Bouton pour changer d'utilisateur (test) -->
-    <div class="actions">
-      <ion-button expand="block" color="secondary" (click)="changeUser()">
-        Changer d'utilisateur (test)
-      </ion-button>
-    </div>
+      </div>
+
+      <div class="actions">
+        <ion-button expand="block" class="action-btn" (click)="changeUser()">
+          Changer d'utilisateur (Test)
+        </ion-button>
+      </div>
+
+    } @else {
+      <div class="loading">
+        <ion-spinner></ion-spinner>
+      </div>
+    }
+
   </div>
 </ion-content>

@@ -17,7 +17,8 @@ const routes: Routes = [
   {
     path: 'listing-spots',
     loadChildren: () => import('./listing-spots/listing-spots.module').then( m => m.ListingSpotsPageModule)
-  }
+  },
+
 ];
 
 @NgModule({

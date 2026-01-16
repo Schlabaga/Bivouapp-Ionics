@@ -1,13 +1,87 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>spot-detail</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" class="spot-content">
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">spot-detail</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  @if (spot) {
+    <div class="hero-container">
+      <img [src]="spot.imageUrl" [alt]="spot.title" class="hero-img">
+
+      <div class="header-buttons">
+        <ion-button class="nav-btn back-btn" fill="clear" routerLink="/tabs/explore">
+          <ion-icon name="chevron-back-outline"></ion-icon>
+        </ion-button>
+
+        <ion-button class="nav-btn fav-btn" fill="clear" (click)="toggleFavorite()">
+          <ion-icon [name]="spot.isFavorite ? 'heart' : 'heart-outline'"
+                    [color]="spot.isFavorite ? 'danger' : 'medium'"></ion-icon>
+        </ion-button>
+      </div>
+    </div>
+
+    <div class="detail-container">
+      <div class="title-section">
+        <div class="top-row">
+          <h1>{{ spot.title }}</h1>
+          <ion-button fill="clear" class="map-link" (click)="toggleMap()">
+            Cacher carte
+          </ion-button>
+        </div>
+
+        <div class="rating-row">
+          <ion-icon name="star" color="warning"></ion-icon>
+          <span class="rating">{{ spot.rating }} (355 notes)</span>
+        </div>
+      </div>
+
+      <div class="map-container" [class.visible]="showMap">
+        <div id="mini-map"></div>
+      </div>
+
+      <div class="description-section">
+        <p class="description-text">
+          {{ spot.description }}
+          <span class="read-more">Voir plus <ion-icon name="chevron-down"></ion-icon></span>
+        </p>
+      </div>
+
+      <div class="services-section">
+        <h3>Services</h3>
+        <div class="services-grid">
+          @for (serviceId of spot.services; track serviceId) {
+            <div class="service-card">
+              <ion-icon [name]="getServiceIcon(serviceId)"></ion-icon>
+              <span>{{ getServiceLabel(serviceId) }}</span>
+            </div>
+          }
+          <div class="service-card">
+            <ion-icon name="car-sport-outline"></ion-icon>
+            <span>Accès voiture</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div style="padding: 20px; text-align: center; margin-top: 50px;">
+      <ion-spinner></ion-spinner>
+    </div>
+  }
+
 </ion-content>
+
+@if (spot) {
+  <ion-footer class="spot-footer">
+    <div class="footer-content">
+      <div class="price-info">
+        <span class="label">Prix</span>
+        @if (spot.price > 0) {
+          <span class="value">{{ spot.price }}€</span>
+        } @else {
+          <span class="value free">Gratuit</span>
+        }
+      </div>
+
+      <ion-button class="action-btn" expand="block">
+        J'y vais !
+        <ion-icon slot="end" name="arrow-forward"></ion-icon>
+      </ion-button>
+    </div>
+  </ion-footer>
+}
