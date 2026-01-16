@@ -1,23 +1,26 @@
+// l'image qui prend tout l'écran en fond
 .full-screen-bg {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  z-index: -1;
+  object-fit: cover; // pour pas que l'image soit écrasée
+  z-index: -1; // on la met derrière tout le reste
 }
 
+// le conteneur pour le texte et les boutons
 .content {
   position: relative;
   z-index: 1;
-  min-height: 100vh;
+  min-height: 100vh; // prend toute la hauteur du téléphone
   display: flex;
-  flex-direction: column;
+  flex-direction: column; // aligne verticalement
   padding: 20px;
   box-sizing: border-box;
 }
 
+// le titre en haut
 h1 {
   padding-top: 10vh;
   font-family: 'Akronim', cursive;
@@ -25,12 +28,11 @@ h1 {
   color: white;
   text-align: center;
   margin: 0;
-
   font-weight: 400 ;
 }
 
 .bottom-group {
-  margin-top: auto;
+  margin-top: auto; // pousse tout le bloc vers le bas de l'écran
   margin-bottom: 20px;
   color: white;
   width: 100%;
@@ -48,6 +50,7 @@ h1 {
     margin-bottom: 30px;
   }
 
+  // le bouton bleu
   button {
     width: 100%;
     padding: 18px;
@@ -63,10 +66,10 @@ h1 {
   }
 }
 
-
+// réglages pour les écrans plus grands
 @media (min-width: 768px) {
   h1 {
-    font-size: 115px;
+    font-size: 115px; // on grossit le titre
   }
 
   .bottom-group {

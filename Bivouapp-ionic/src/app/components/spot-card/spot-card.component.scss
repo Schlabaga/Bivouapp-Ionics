@@ -1,101 +1,79 @@
+// le rectangle blanc tout propre
 .card-container {
-  background: white;
+  background: #fff;
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05); /* Ombre très légère */
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
   margin-bottom: 10px;
-  transition: transform 0.2s;
-
-  &:active {
-    transform: scale(0.98);
-  }
+  transition: 0.2s;
+  &:active { transform: scale(0.98); } // effet quand on clique
 }
 
+// la zone de l'image
 .image-wrapper {
   position: relative;
   height: 140px;
-  width: 100%;
+  img { width: 100%; height: 100%; object-fit: cover; }
 
-  .spot-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  /* Le cœur en haut à droite */
+  // le bouton pour le coeur
   .fav-btn {
-    cursor: pointer;
     position: absolute;
     top: 10px;
     right: 10px;
-    background: rgba(255, 255, 255, 0.2); /* Semi-transparent */
-    backdrop-filter: blur(5px);
+    background: rgba(255,255,255,0.2);
     width: 32px;
     height: 32px;
     border-radius: 50%;
     display: flex;
-    justify-content: center;
     align-items: center;
-    font-size: 18px;
+    justify-content: center;
     z-index: 10;
+    cursor: pointer;
   }
 
+  // le badge de distance en bas à droite
   .distance-badge {
     position: absolute;
     bottom: 10px;
     right: 10px;
     background: #374b43;
-    color: white;
+    color: #fff;
     padding: 4px 10px;
     border-radius: 12px;
-    font-size: 11px;
-    font-weight: 700;
+    font: bold 11px sans-serif;
   }
 }
 
+// la partie avec le texte
 .info-content {
   padding: 12px;
 
+  // titre du spot qui se coupe si trop long
   .title {
-    margin: 0 0 4px 0;
-    font-size: 15px;
-    font-weight: 700;
+    margin: 0 0 4px;
+    font: bold 15px sans-serif;
     color: #1a1a1a;
-    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
-  .tag-row {
+  // les lignes pour les tags et les étoiles
+  .tag-row, .rating-row {
     display: flex;
     align-items: center;
     gap: 4px;
     margin-bottom: 8px;
-
-    ion-icon { font-size: 14px; color: #5b9bd5; }
-    span { font-size: 11px; color: #666; font-weight: 500; }
+    font-size: 11px;
+    color: #666;
   }
 
-  .rating-row {
-    display: flex;
-    gap: 2px;
-    margin-bottom: 8px;
+  .star-icon { color: #ffd700; font-size: 14px; }
 
-    .star-icon {
-      color: #ffd700; /* Jaune or */
-      font-size: 14px;
-    }
-  }
-
-  .price-row {
-    .price {
-      font-size: 18px;
-      font-weight: 800;
-      color: #2f4f4f; /* Vert foncé sombre */
-
-      &.free {
-        color: #00d68f; /* Vert flash "Gratuit" */
-      }
-    }
+  // le prix en gras
+  .price {
+    font: 650 18px sans-serif;
+    color: #2f4f4f;
+    &.free { color: #00d68f; } // vert si c'est gratuit
   }
 }

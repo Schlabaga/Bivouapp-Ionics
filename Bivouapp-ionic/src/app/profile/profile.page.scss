@@ -1,22 +1,19 @@
-ion-content {
-  --background: #fff;
-}
+// fond blanc basique
+ion-content { --background: #fff; }
 
 .main-container {
-  padding: 20px;
-  padding-bottom: 40px;
+  padding: 20px 20px 40px; // de la place sur les côtés et en bas
 }
 
-/* Titre MON PROFIL */
+// titre mon profil
 .page-title {
   font-size: 32px;
-  font-weight: 400; /* Un peu fin comme sur ton image */
-  margin-top: 20px;
-  margin-bottom: 30px;
+  font-weight: 400;
+  margin: 20px 0 30px;
   color: #000;
 }
 
-/* Header avec la photo */
+// toute la zone du haut avec la photo
 .profile-header {
   display: flex;
   flex-direction: column;
@@ -30,76 +27,57 @@ ion-content {
     overflow: hidden;
     background: #F6F8FC;
     margin-bottom: 15px;
-
-    img {
-      width: 100%;
+    img { width: 100%;
       height: 100%;
-      object-fit: cover;
-    }
+      object-fit: cover; }
   }
 
-  h2 {
-    margin: 0;
+  h2 { margin: 0;
     font-size: 24px;
     font-weight: 700;
-    color: #000;
-  }
-
-  .since {
-    margin-top: 5px;
+    color: #000; }
+  .since { margin-top: 5px;
     color: #888;
-    font-size: 14px;
-  }
+    font-size: 14px; }
 }
 
-/* Les blocs d'infos */
+// les titres au dessus des blocs
 .info-group {
   margin-bottom: 20px;
-
   label {
     display: block;
-    font-size: 14px;
-    font-weight: 700;
+    font: bold 14px sans-serif;
     color: #000;
-    margin-bottom: 8px;
-    padding-left: 5px;
+    margin: 0 0 8px 5px;
   }
 }
 
+// les rectangles gris avec les infos
 .info-box {
-  background: #F6F8FC; /* Le fameux gris clair */
+  background: #F6F8FC; // le gris clair habituel
   border-radius: 12px;
   padding: 15px;
   display: flex;
-  align-items: flex-start; /* Pour aligner en haut si le texte est long */
+  align-items: flex-start;
   gap: 15px;
   min-height: 55px;
 
-  ion-icon {
-    font-size: 22px;
-    color: #9CA3AF;
-    margin-top: 2px;
-  }
-
-  span {
-    color: #000; /* Texte bien noir */
-    font-size: 15px;
-    font-weight: 500;
-    line-height: 1.4;
-  }
+  ion-icon { font-size: 22px; color: #9CA3AF; margin-top: 2px; }
+  span { color: #000; font-size: 15px; font-weight: 500; }
 }
 
-/* Bouton */
+// le gros bouton bleu
 .action-btn {
   margin-top: 20px;
   --background: #2f65e8;
   --border-radius: 12px;
-  height: 50px;
   color: white;
+  height: 50px;
   font-weight: 600;
-  text-transform: none;
+  text-transform: none; // pour pas que ça soit tout en majuscules
 }
 
+// centrer le chargement
 .loading {
   text-align: center;
   margin-top: 50px;

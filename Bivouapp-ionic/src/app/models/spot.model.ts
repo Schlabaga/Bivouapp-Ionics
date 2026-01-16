@@ -13,7 +13,7 @@ export interface Spot {
   latitude: number;
   longitude: number;
 }
-// Service disponible pour un spot
+// service disponible pour un spot
 export interface Service {
   id: string;
   label: string;

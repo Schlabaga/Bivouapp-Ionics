@@ -32,53 +32,53 @@ export class PublishPage implements OnInit {
     this.spotForm = this.formBuilder.group({
       title: ['', [Validators.required]],
       description: ['', [Validators.required]],
-      location: ['Spot inconnu'], // L'utilisateur peut changer ça
+      location: ['Spot inconnu'],
       longitude: [0, [Validators.required]],
       latitude: [0, [Validators.required]],
       rating: [4],
-      price: [null], // Null pour afficher le placeholder
+      price: [null], // null pour afficher le placeholder
       services: [[]],
-      imageUrl: ['https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=600'], // Image par défaut
+      imageUrl: ['https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=600'], // image par défaut
       type: 'bivouac',
       isFavorite: false
     });
   }
 
-  // On charge la carte quand la page s'affiche
+  // on charge la carte quand la page s'affiche
   ionViewDidEnter() {
     this.initMap();
   }
 
   initMap() {
-    // Si la carte existe déjà, on touche à rien (sinon ça bug)
+    // si la carte existe déjà, on touche à rien (sinon ça bug)
     if (this.map) return;
 
-    // On centre sur la France ou Sallanches par défaut
+    // sallanches par défaut
     const defaultLat = 45.9366;
     const defaultLng = 6.6300;
 
     this.map = L.map('map-publish', {
-      zoomControl: false // On vire les boutons zoom pour le style
+      zoomControl: false // on enleve les boutons zoom pour le style
     }).setView([defaultLat, defaultLng], 12);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: ''
     }).addTo(this.map);
 
-    // On crée une icône perso (sinon Leaflet bug parfois avec Angular)
+    // on crée une icône perso (sinon Leaflet bug )
     const icon = L.icon({
       iconUrl: 'assets/icon/favicon.png', // Mets ton icône ici
       iconSize: [30, 30],
       iconAnchor: [15, 15]
     });
 
-    // On ajoute un marqueur qu'on peut bouger (draggable: true)
+    // on ajoute un marqueur qu'on peut bouger (draggable: true)
     this.marker = L.marker([defaultLat, defaultLng], {
       icon: icon,
       draggable: true
     }).addTo(this.map);
 
-    // On met à jour le formulaire par défaut
+    // on met à jour le formulaire par défaut
     this.updateCoordinates(defaultLat, defaultLng);
 
     // QUAND ON BOUGE LE MARQUEUR
@@ -120,14 +120,14 @@ export class PublishPage implements OnInit {
       const newSpot = {
         ...this.spotForm.value,
         id: Date.now(),
-        distance: 0, // Calculera plus tard
-        price: this.spotForm.value.price || 0 // Si vide = 0 (Gratuit)
+        distance: 0,
+        price: this.spotForm.value.price || 0 // Si vide = 0
       };
 
       this.spotsService.addSpot(newSpot);
 
       const toast = await this.toastController.create({
-        message: 'Spot publié avec succès mon gaté !',
+        message: 'Spot publié avec succès !',
         duration: 2000,
         color: 'success',
         position: 'bottom'
@@ -139,7 +139,7 @@ export class PublishPage implements OnInit {
       // reset
       this.spotForm.reset();
     } else {
-      // Si formulaire invalide
+      // si formulaire invalide les toast c une popup
       const toast = await this.toastController.create({
         message: 'Il manque des infos ! Vérifie le titre et la carte.',
         duration: 2000,

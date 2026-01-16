@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
 import { ProfilePageRoutingModule } from './profile-routing.module';
-
+import {TimeAgoPipe} from "../pipes/timeago-pipe";
 import { ProfilePage } from './profile.page';
 
 @NgModule({
@@ -13,7 +13,8 @@ import { ProfilePage } from './profile.page';
     CommonModule,
     FormsModule,
     IonicModule,
-    ProfilePageRoutingModule
+    ProfilePageRoutingModule,
+    TimeAgoPipe
   ],
   declarations: [ProfilePage]
 })

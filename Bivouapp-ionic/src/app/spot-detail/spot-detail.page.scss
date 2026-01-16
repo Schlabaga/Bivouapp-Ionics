@@ -1,24 +1,22 @@
-/* On vire le padding par défaut pour que l'image colle aux bords */
 ion-content {
   --background: #fff;
 }
 
-.hero-container {
+.main-container {
   position: relative;
-  height: 350px; /* Grande image */
+  height: 350px; /* grande image */
   width: 100%;
 }
 
-.hero-img {
+.main-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-/* LES BOUTONS FLOTTANTS (Le carré blanc et le rond blanc) */
 .header-buttons {
   position: absolute;
-  top: 50px; /* Ajuste selon la "safe area" de l'iPhone */
+  top: 50px;
   left: 20px;
   right: 20px;
   display: flex;
@@ -36,20 +34,13 @@ ion-content {
   --color: #000;
 }
 
-.back-btn {
-  border-radius: 12px; /* Carré arrondi à gauche */
-}
-
-.fav-btn {
-  border-radius: 50%; /* Rond parfait à droite */
-}
 
 /* LE CONTENU SOUS L'IMAGE */
 .detail-container {
   padding: 20px;
-  border-radius: 30px 30px 0 0; /* L'arrondi qui remonte sur l'image */
+  border-radius: 30px 30px 0 0;
   background: white;
-  margin-top: -30px; /* On fait chevaucher l'image */
+  margin-top: -30px; /* on fait chevaucher l'image */
   position: relative;
   z-index: 5;
 }
@@ -99,7 +90,7 @@ ion-content {
   transition: height 0.3s ease;
 
   &.visible {
-    height: 200px; /* Hauteur de la carte quand ouverte */
+    height: 200px; /* hauteur de la carte quand ouverte */
     margin-bottom: 20px;
     border-radius: 15px;
   }
@@ -114,7 +105,7 @@ ion-content {
   .read-more {
     color: #2f65e8;
     font-weight: 600;
-    display: block; /* Force le passage à la ligne ou inline-block */
+    display: block; /* force le passage à la ligne */
     margin-top: 5px;
   }
 }
@@ -132,24 +123,24 @@ ion-content {
   .services-grid {
     display: flex;
     gap: 10px;
-    overflow-x: auto; /* Scroll horizontal si y'en a trop */
+    overflow-x: auto; /* scroll horizontal si y'en a trop */
     padding-bottom: 10px;
 
-    /* On cache la barre de scroll moche */
+    /* cache la barre de scroll */
     &::-webkit-scrollbar { display: none; }
   }
 
   .service-card {
     min-width: 100px;
     height: 100px;
-    background: #F8F9FE; /* Gris très clair bleuté */
+    background: #F8F9FE;
     border-radius: 16px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 10px;
-    color: #9CA3AF; /* Gris icône */
+    color: #9CA3AF;
 
     ion-icon {
       font-size: 28px;
@@ -163,11 +154,11 @@ ion-content {
   }
 }
 
-/* LE FOOTER (PRIX ET BOUTON) */
+
 ion-footer {
   background: white;
   box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
-  padding: 10px 20px 30px 20px; /* Un peu de marge en bas pour les iPhone récents */
+  padding: 10px 20px 30px 20px;
 
   .footer-content {
     display: flex;
@@ -181,7 +172,7 @@ ion-footer {
 
     .label { font-size: 12px; color: #666; }
     .value { font-size: 22px; font-weight: 800; color: #1a1a1a; }
-    .value.free { color: #2DD36F; /* Vert "Gratuit" */ }
+    .value.free { color: #2DD36F; }
   }
 
   .action-btn {
@@ -191,7 +182,7 @@ ion-footer {
     font-weight: 700;
     font-size: 16px;
     color: white;
-    --background: #2f65e8; /* Ton bleu */
+    --background: #2f65e8;
     text-transform: none;
   }
 }

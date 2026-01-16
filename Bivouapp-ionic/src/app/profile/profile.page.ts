@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { User } from '../models/user.model';
 import { UsersService } from '../services/users';
+import {TimeAgoPipe} from "../pipes/timeago-pipe";
 
 @Component({
   selector: 'app-profile',
@@ -27,7 +28,7 @@ export class ProfilePage implements OnInit {
 
   getTimeAgo(date: Date): string {
     const now = new Date();
-    // Petite sécu si la date est une string qui vient d'une API
+    // sécu si la date est une string
     const created = new Date(date);
     const diffTime = Math.abs(now.getTime() - created.getTime());
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));

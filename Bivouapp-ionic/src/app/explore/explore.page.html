@@ -34,7 +34,7 @@
               <div class="card-overlay">
                 <div class="badges-row">
                   <div class="name-badge">{{ spot.title }}</div>
-                  <div class="fav-badge">
+                  <div class="fav-badge" (click)="toggleFavorite(spot, $event)">
                     <ion-icon [name]="spot.isFavorite ? 'heart' : 'heart-outline'"
                               [color]="spot.isFavorite ? 'danger' : 'medium'"></ion-icon>
                   </div>

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Spot, Service } from '../models/spot.model';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +17,7 @@ export class SpotsService {
     { id: 'shower', label: 'Douche', icon: 'rainy-outline' },
   ];
 
-  // Tableau qui contient tous les spots pour test
+  // tableau qui contient tous les spots pour test
   private spots: Spot[] = [
     // TYPE: BIVOUAC
     {
@@ -108,14 +108,16 @@ export class SpotsService {
     }
   ];
 
+  // pour notifier tous les composants des changements
+  private spotsSubject = new BehaviorSubject<Spot[]>(this.spots);
+  // ca permet d'actualiser et ça envoie la nouvelle liste à tous ceux qui l'utilisent
+  public observable = this.spotsSubject.asObservable();
+
   constructor() {}
 
   // retourne tous les spots sous forme d'Observable
   getSpots(): Observable<Spot[]> {
-    return new Observable(observer => {
-      observer.next(this.spots);
-      observer.complete();
-    });
+    return this.observable;
   }
 
   // retourne tous les services disponibles
@@ -126,6 +128,7 @@ export class SpotsService {
   // ajoute un nouveau spot dans le tableau
   addSpot(newSpot: Spot): void {
     this.spots.push(newSpot);
+    this.spotsSubject.next([...this.spots]); // Notifie tous les abonnés
   }
 
   // cherche un spot par son ID et le retourne dans un Observable
@@ -142,6 +145,7 @@ export class SpotsService {
     const spot = this.spots.find(s => s.id === id);
     if (spot) {
       spot.isFavorite = !spot.isFavorite;
+      this.spotsSubject.next([...this.spots]); // Notifie tous les abonnés du changement
     }
   }
 

@@ -27,7 +27,11 @@
           <div id="map-publish"></div>
           <div class="map-overlay">
             <ion-icon name="location"></ion-icon>
-            <span>{{ spotForm.get('latitude')?.value | number:'1.2-2' }}, {{ spotForm.get('longitude')?.value | number:'1.2-2' }}</span>
+
+            <span>
+              {{ spotForm.get('latitude')?.value | number:'1.2-2' }},
+              {{ spotForm.get('longitude')?.value | number:'1.2-2' }}
+            </span>
           </div>
         </div>
       </div>
@@ -37,10 +41,13 @@
           <div class="input-group">
             <label>Note</label>
             <div class="stars-row">
-              <ion-icon *ngFor="let s of [1,2,3,4,5]"
-                        [name]="spotForm.get('rating')?.value >= s ? 'star' : 'star-outline'"
-                        [class.active]="spotForm.get('rating')?.value >= s"
-                        (click)="setRating(s)"></ion-icon>
+              @for (s of [1,2,3,4,5]; track s) {
+                <ion-icon
+                  [name]="spotForm.get('rating')?.value >= s ? 'star' : 'star-outline'"
+                  [class.active]="spotForm.get('rating')?.value >= s"
+                  (click)="setRating(s)">
+                </ion-icon>
+              }
             </div>
           </div>
         </ion-col>
@@ -58,13 +65,14 @@
       <div class="input-group">
         <label>Services</label>
         <div class="services-scroll">
-          <div class="service-box"
-               *ngFor="let service of allServices"
-               [class.selected]="isServiceSelected(service.id)"
-               (click)="toggleService(service.id)">
-            <ion-icon [name]="service.icon"></ion-icon>
-            <span>{{ service.label }}</span>
-          </div>
+          @for (service of allServices; track service.id) {
+            <div class="service-box"
+                 [class.selected]="isServiceSelected(service.id)"
+                 (click)="toggleService(service.id)">
+              <ion-icon [name]="service.icon"></ion-icon>
+              <span>{{ service.label }}</span>
+            </div>
+          }
         </div>
       </div>
 

@@ -36,10 +36,7 @@ export class FavoritesPage implements OnInit {
   }
 
   removeFavorite(spot: Spot) {
-    // on met à jour le service
     this.spotsService.toggleFavorite(spot.id);
-
-    this.favoriteSpots = this.favoriteSpots.filter(s => s.id !== spot.id);
   }
 
   openSpotDetail(id: number) {

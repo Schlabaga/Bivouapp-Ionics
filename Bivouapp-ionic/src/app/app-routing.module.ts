@@ -14,10 +14,7 @@ const routes: Routes = [
     path: 'spot-detail',
     loadChildren: () => import('./spot-detail/spot-detail.module').then( m => m.SpotDetailPageModule)
   },
-  {
-    path: 'listing-spots',
-    loadChildren: () => import('./listing-spots/listing-spots.module').then( m => m.ListingSpotsPageModule)
-  },
+
 
 ];
 

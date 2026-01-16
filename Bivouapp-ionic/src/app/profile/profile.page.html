@@ -10,7 +10,7 @@
           <img [src]="user.profileImageUrl" [alt]="user.name">
         </div>
         <h2>{{ user.name }}</h2>
-        <p class="since">Membre depuis {{ getTimeAgo(user.createdAt) }}</p>
+        <p class="since">Membre depuis {{ user.createdAt | timeAgo}}</p>
       </div>
 
       <div class="info-section">

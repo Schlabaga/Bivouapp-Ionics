@@ -25,8 +25,6 @@ export class SpotCardComponent {
   onToggleFavorite(event: Event) {
     event.stopPropagation();
 
-    this.spot.isFavorite = !this.spot.isFavorite;
-
     // pour changer directement on prévient l'event du parent
     this.favoriteToggled.emit();
   }

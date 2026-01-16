@@ -29,7 +29,7 @@ const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: '/tabs/explore',
+        redirectTo: '/welcome',
         pathMatch: 'full'
       }
     ]
