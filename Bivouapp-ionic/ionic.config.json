@@ -1,0 +1,7 @@
+{
+  "name": "Bivouapp-ionic",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
