@@ -18,7 +18,7 @@ export class SpotsService {
   ];
 
   // tableau qui contient tous les spots pour test
-  private spots: Spot[] = [
+  spots: Spot[] = [
     // TYPE: BIVOUAC
     {
       id: 1, title: 'Mont des Pyrénées', description: 'Vue imprenable sur la chaîne.', price: 25, rating: 4.8, distance: 12, imageUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600', services: ['fire', 'water'], isFavorite: false, location: 'Pyrénées', type: 'bivouac',

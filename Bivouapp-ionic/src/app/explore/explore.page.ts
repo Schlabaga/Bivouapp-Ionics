@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ViewWillEnter } from '@ionic/angular';
 import { Spot } from '../models/spot.model';
-import { SpotsService } from '../services/spots';
+import { SupabaseService } from '../services/supabase';
 
 @Component({
   selector: 'app-explore',
@@ -12,12 +12,13 @@ import { SpotsService } from '../services/spots';
 })
 export class ExplorePage implements OnInit, ViewWillEnter {
 
-  // les listes pour stocker nos spots
+  // On garde une seule source de vérité pour les spots
   allSpots: Spot[] = [];
   popularSpots: Spot[] = [];
   recommendedSpots: Spot[] = [];
   filteredSpots: Spot[] = [];
-  selectedCategory = 'feed'; // la catégorie de base
+
+  selectedCategory = 'feed';
 
   categories = [
     { id: 'feed', label: 'Mon feed' },
@@ -29,63 +30,70 @@ export class ExplorePage implements OnInit, ViewWillEnter {
   ];
 
   constructor(
-    private spotsService: SpotsService,
-    private router: Router
+    private router: Router,
+    private supabaseService: SupabaseService,
   ) {}
 
-  ngOnInit() {
-    this.loadSpots();
+  async ngOnInit() {
+    // Initialisation au chargement
+    await this.loadSpotsFromSupabase();
   }
 
-  // ça recharge les données quand on revient sur la page
-  ionViewWillEnter() {
-    this.loadSpots();
+  // Ça recharge les données quand on revient sur la page (utile si on a ajouté un spot entre temps)
+  async ionViewWillEnter() {
+    await this.loadSpotsFromSupabase();
   }
 
-  loadSpots() {
-    this.spotsService.getSpots().subscribe({
-      next: (spots) => {
-        this.allSpots = spots;
-        this.popularSpots = this.spotsService.getPopularSpots();
-        this.recommendedSpots = this.spotsService.getRecommendedSpots();
+  async loadSpotsFromSupabase() {
+    try {
+      const data = await this.supabaseService.getSpots();
+      this.allSpots = data || [];
 
-        // on relance le tri si on a déjà choisi un filtre
-        if (this.selectedCategory !== 'feed') {
-          this.selectCategory(this.selectedCategory);
-        }
-      },
-      error: (err) => console.error(err)
-    });
+      // On génère nos listes filtrées à partir des données Supabase
+      this.popularSpots = this.allSpots.filter(s => s.rating >= 4); // Exemple : spots bien notés
+      this.recommendedSpots = this.allSpots.slice(0, 5); // Exemple : les 5 derniers
+
+      // On applique le filtre de catégorie actuel
+      this.selectCategory(this.selectedCategory);
+
+      console.log('Spots chargés depuis Supabase :', this.allSpots);
+    } catch (err) {
+      console.error('Erreur lors de la récupération des spots :', err);
+    }
   }
 
-  // pour filtrer les spots quand on clique sur une catégorie
   selectCategory(catId: string) {
     this.selectedCategory = catId;
 
     if (catId === 'feed') {
+      // Dans le feed, on peut imaginer un mélange ou les spots recommandés
+      this.filteredSpots = [...this.recommendedSpots];
       return;
     }
 
     if (catId === 'tout') {
-      this.filteredSpots = [...this.allSpots]; // on affiche tout
+      this.filteredSpots = [...this.allSpots];
     } else {
-      // on garde que ceux qui correspondent au type
+      // Filtrage par type (attention à la casse dans ta DB !)
       this.filteredSpots = this.allSpots.filter(
-        s => s.type.toLowerCase() === catId.toLowerCase()
+        s => s.type?.toLowerCase() === catId.toLowerCase()
       );
     }
   }
 
-  // pour aller voir la page du spot
   openSpotDetail(spotId: number) {
     this.router.navigate(['/tabs/spot-detail', spotId]);
   }
 
-  // pour mettre ou enlever le coeur
-  toggleFavorite(spot: Spot, event?: Event) {
+  async toggleFavorite(spot: Spot, event?: Event) {
     if (event) {
-      event.stopPropagation(); // pour pas que ça ouvre le détail du spot
+      event.stopPropagation();
     }
-    this.spotsService.toggleFavorite(spot.id);
+
+    // Pour l'instant on change l'état localement
+    spot.isFavorite = !spot.isFavorite;
+
+    // TODO: Appeler supabaseService.updateFavorite(spot.id, spot.isFavorite)
+    // pour que ce soit enregistré en ligne !
   }
 }
