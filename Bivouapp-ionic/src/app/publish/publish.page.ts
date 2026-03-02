@@ -124,7 +124,7 @@ export class PublishPage implements OnInit {
         price: this.spotForm.value.price || 0 // Si vide = 0
       };
 
-      this.spotsService.addSpot(newSpot);
+      await this.spotsService.addSpot(newSpot);
 
       const toast = await this.toastController.create({
         message: 'Spot publié avec succès !',

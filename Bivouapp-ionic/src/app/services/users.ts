@@ -85,4 +85,18 @@ export class UsersService {
   getUserById(id: number): User | undefined {
     return this.users.find(u => u.id === id);
   }
+
+  editUserById(id:number, changes:Partial<User>): boolean {
+    const index = this.users.findIndex(u => u.id === id);
+
+    if(index !== -1){
+
+      this.users[index] = {
+        ...this.users[index],
+        ...changes
+      };
+      return true;
+    }
+    return false;
+  }
 }

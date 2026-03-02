@@ -14,6 +14,14 @@ const routes: Routes = [
     path: 'spot-detail',
     loadChildren: () => import('./spot-detail/spot-detail.module').then( m => m.SpotDetailPageModule)
   },
+  {
+    path: 'sign-in',
+    loadChildren: () => import('./auth/sign-in/sign-in.module').then( m => m.SignInPageModule)
+  },
+  {
+    path: 'sign-up',
+    loadChildren: () => import('./auth/sign-up/sign-up.module').then( m => m.SignUpPageModule)
+  },
 
 
 ];
