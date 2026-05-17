@@ -28,6 +28,19 @@ const routes: Routes = [
         loadChildren: () => import('../spot-detail/spot-detail.module').then(m => m.SpotDetailPageModule)
       },
       {
+        path: 'sign-in',
+        loadChildren: () => import('../auth/sign-in/sign-in.module').then(m => m.SignInPageModule)
+      },
+      {
+        path: 'sign-up',
+        loadChildren: () => import('../auth/sign-up/sign-up.module').then(m => m.SignUpPageModule)
+      },
+      {
+        path: 'profile',
+        loadChildren: () => import('../profile/profile.module').then(m => m.ProfilePageModule)
+      },
+
+      {
         path: '',
         redirectTo: '/welcome',
         pathMatch: 'full'
