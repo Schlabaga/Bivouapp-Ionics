@@ -21,7 +21,11 @@ const routes: Routes = [
   {
     path: 'sign-up',
     loadChildren: () => import('./auth/sign-up/sign-up.module').then( m => m.SignUpPageModule)
+  },  {
+    path: 'map',
+    loadChildren: () => import('./map/map.module').then( m => m.MapPageModule)
   },
+
 
 
 ];
