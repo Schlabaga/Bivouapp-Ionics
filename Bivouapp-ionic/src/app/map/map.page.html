@@ -1,15 +1,19 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>map</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
+  <ion-header class="ion-no-border">
     <ion-toolbar>
-    <ion-searchbar  show-clear-button="always" placeholder="Rechercher une ville, un lieu..." class="custom-search"></ion-searchbar>
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/tabs/explore" text="" icon="chevron-back"></ion-back-button>
+      </ion-buttons>
     </ion-toolbar>
   </ion-header>
+
+  <ion-searchbar
+    show-clear-button="always"
+    placeholder="Rechercher une ville, un lieu..."
+    class="custom-search">
+  </ion-searchbar>
+
+  <div id="map"></div>
 
   <ion-list class="display-spots">
     <ion-item></ion-item>

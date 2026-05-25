@@ -7,7 +7,18 @@ import { Component } from '@angular/core';
   standalone: false,
 })
 export class TabsPage {
+  showTabBar=true;
 
   constructor() {}
 
+  ionTabsWillChange(event:any){
+    if(event.tab){
+      if(event.tab == 'map'){
+        this.showTabBar= false;
+      } else{
+        this.showTabBar= true;
+      }
+    }
+
+  }
 }
