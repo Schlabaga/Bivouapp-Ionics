@@ -5,7 +5,7 @@ import {authGuard} from "./guards/auth-guard";
 const routes: Routes = [
   {
     path: 'welcome',
-    loadChildren: () => import('./welcome/welcome.module').then(m => m.WelcomePageModule)
+    loadChildren: () => import('./auth/welcome/welcome.module').then(m => m.WelcomePageModule)
   },
   {
     path: '',

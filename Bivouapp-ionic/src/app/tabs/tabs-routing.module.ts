@@ -4,6 +4,19 @@ import { TabsPage } from './tabs.page';
 
 const routes: Routes = [
   {
+    path: 'auth',
+    children: [
+      {
+        path: 'sign-in',
+        loadChildren: () => import('../auth/sign-in/sign-in.module').then(m => m.SignInPageModule)
+      },
+      {
+        path: 'sign-up',
+        loadChildren: () => import('../auth/sign-up/sign-up.module').then(m => m.SignUpPageModule)
+      }
+    ]
+  },
+  {
     path: 'tabs',
     component: TabsPage,
     children: [
@@ -28,24 +41,12 @@ const routes: Routes = [
         loadChildren: () => import('../spot-detail/spot-detail.module').then(m => m.SpotDetailPageModule)
       },
       {
-        path: 'sign-in',
-        loadChildren: () => import('../auth/sign-in/sign-in.module').then(m => m.SignInPageModule)
+        path: 'map',
+        loadChildren: () => import('../map/map.module').then(m => m.MapPageModule)
       },
-      {
-        path: 'sign-up',
-        loadChildren: () => import('../auth/sign-up/sign-up.module').then(m => m.SignUpPageModule)
-      },
-      {
-        path: 'profile',
-        loadChildren: () => import('../profile/profile.module').then(m => m.ProfilePageModule)
-      },
-
-      {path:'map',
-      loadChildren: () => import('../map/map.module').then(m => m.MapPageModule)},
-
       {
         path: '',
-        redirectTo: '/welcome',
+        redirectTo: 'explore',
         pathMatch: 'full'
       }
     ]
@@ -59,5 +60,6 @@ const routes: Routes = [
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
 })
 export class TabsPageRoutingModule {}
