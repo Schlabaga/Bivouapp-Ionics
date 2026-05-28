@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth';
 import { Router } from '@angular/router';
+import {isValidDate} from "rxjs/internal/util/isDate";
+import {dateTimestampProvider} from "rxjs/internal/scheduler/dateTimestampProvider";
 
 @Component({
   selector: 'app-sign-up',
@@ -11,6 +13,7 @@ import { Router } from '@angular/router';
 export class SignUpPage implements OnInit {
   email = '';
   password = '';
+  date = '';
 
   constructor(private authService: AuthService, private router: Router) { }
 
@@ -25,4 +28,5 @@ export class SignUpPage implements OnInit {
       await this.router.navigateByUrl('/tabs/explore');
     }
   }
+
 }

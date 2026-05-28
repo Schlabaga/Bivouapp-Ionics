@@ -27,6 +27,13 @@
       <ion-input type="password" [(ngModel)]="password"></ion-input>
     </ion-item>
 
+
+    <ion-item lines="full">
+      <ion-label position="floating">Date de naissance</ion-label>
+      <ion-input type="date" [(ngModel)]="date"></ion-input>
+    </ion-item>
+
+
     <ion-button expand="block" (click)="handleSignUp()" class="ion-margin-top">
       S'inscrire
     </ion-button>
