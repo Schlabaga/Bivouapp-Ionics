@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth';
 import { Router } from '@angular/router';
-import {isValidDate} from "rxjs/internal/util/isDate";
-import {dateTimestampProvider} from "rxjs/internal/scheduler/dateTimestampProvider";
+import { AlertController } from '@ionic/angular';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
   selector: 'app-sign-up',
@@ -13,20 +13,38 @@ import {dateTimestampProvider} from "rxjs/internal/scheduler/dateTimestampProvid
 export class SignUpPage implements OnInit {
   email = '';
   password = '';
+  confirmPassword = '';
   date = '';
 
-  constructor(private authService: AuthService, private router: Router) { }
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private alertCtrl: AlertController
+  ) {}
 
-  ngOnInit() { }
+  ngOnInit() {}
 
   async handleSignUp() {
+    if (this.password !== this.confirmPassword) {
+      const alert = await this.alertCtrl.create({
+        header: 'Erreur',
+        message: 'Les mots de passe ne correspondent pas.',
+        buttons: ['OK'],
+      });
+      await alert.present();
+      return;
+    }
+
     const { data, error } = await this.authService.signUp(this.email, this.password);
     if (error) {
-      console.error('Erreur inscription:', error.message);
+      const alert = await this.alertCtrl.create({
+        header: 'Erreur',
+        message: error.message,
+        buttons: ['OK'],
+      });
+      await alert.present();
     } else {
-      console.log('Utilisateur créé !', data);
       await this.router.navigateByUrl('/tabs/explore');
     }
   }
-
 }

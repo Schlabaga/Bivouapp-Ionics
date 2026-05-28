@@ -1,17 +1,13 @@
-import {CanActivateFn, Router} from '@angular/router';
-import {inject} from "@angular/core";
-import {AuthService} from "../services/auth";
+import { CanActivateFn, Router } from '@angular/router';
+import { inject } from '@angular/core';
+import { AuthService } from '../services/auth';
+import { environment } from '../environment/environment';
 
-export const authGuard: CanActivateFn = (route, state) => {
+export const authGuard: CanActivateFn = async (route, state) => {
+  if (environment.bypassAuth) return true; // ← dev mode
 
   const authService = inject(AuthService);
   const router = inject(Router);
-
-  if(authService.isLoggedIn()){
-    return true;
-
-  } else {
-    return router.createUrlTree(['/sign-in']);
-  }
-
+  const session = await authService.getSession();
+  return session ? true : router.createUrlTree(['/sign-in']);
 };

@@ -1,22 +1,31 @@
 <ion-content [fullscreen]="true">
-  <ion-header class="ion-no-border">
-    <ion-toolbar>
-      <ion-buttons slot="start">
-        <ion-back-button defaultHref="/tabs/explore" text="" icon="chevron-back"></ion-back-button>
-      </ion-buttons>
-    </ion-toolbar>
-  </ion-header>
-
-  <ion-searchbar
-    show-clear-button="always"
-    placeholder="Rechercher une ville, un lieu..."
-    class="custom-search">
-  </ion-searchbar>
 
   <div id="map"></div>
 
-  <ion-list class="display-spots">
-    <ion-item></ion-item>
-  </ion-list>
+  <!-- Searchbar flottante en haut -->
+  <div class="search-overlay">
+    <ion-button class="back-btn" fill="clear" routerLink="/tabs/explore">
+      <ion-icon name="chevron-back-outline"></ion-icon>
+    </ion-button>
+    <ion-searchbar
+      [(ngModel)]="searchQuery"
+      placeholder="Rechercher un lieu..."
+      class="map-searchbar"
+      [debounce]="400"
+      (ionInput)="onSearch($event)">
+    </ion-searchbar>
+  </div>
+
+  <!-- Sort chips flottants en bas -->
+  <div class="bottom-overlay">
+    <div class="sort-chips">
+      @for (option of sortOptions; track option.id) {
+        <div class="chip" [class.active]="selectedSort === option.id" (click)="selectSort(option.id)">
+          <ion-icon [name]="option.icon"></ion-icon>
+          <span>{{ option.label }}</span>
+        </div>
+      }
+    </div>
+  </div>
 
 </ion-content>
