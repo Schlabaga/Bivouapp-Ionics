@@ -31,6 +31,7 @@ export class MapPage implements OnInit {
     { id: 'free',     label: 'Gratuit',     icon: 'pricetag-outline' },
     { id: 'bivouac',  label: 'Bivouac',     icon: 'bonfire-outline' },
     { id: 'water',    label: "Point d'eau", icon: 'water-outline' },
+    
   ];
 
   constructor(private supabaseService: SupabaseService) {}

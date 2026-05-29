@@ -2,22 +2,8 @@
 
   <div id="map"></div>
 
-  <!-- Searchbar flottante en haut -->
-  <div class="search-overlay">
-    <ion-button class="back-btn" fill="clear" routerLink="/tabs/explore">
-      <ion-icon name="chevron-back-outline"></ion-icon>
-    </ion-button>
-    <ion-searchbar
-      [(ngModel)]="searchQuery"
-      placeholder="Rechercher un lieu..."
-      class="map-searchbar"
-      [debounce]="400"
-      (ionInput)="onSearch($event)">
-    </ion-searchbar>
-  </div>
-
-  <!-- Sort chips flottants en bas -->
   <div class="bottom-overlay">
+
     <div class="sort-chips">
       @for (option of sortOptions; track option.id) {
         <div class="chip" [class.active]="selectedSort === option.id" (click)="selectSort(option.id)">
@@ -26,6 +12,20 @@
         </div>
       }
     </div>
+
+    <div class="search-row">
+      <ion-button class="back-btn" fill="clear" routerLink="/tabs/explore">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </ion-button>
+      <ion-searchbar
+        [(ngModel)]="searchQuery"
+        placeholder="Rechercher un lieu..."
+        class="map-searchbar"
+        [debounce]="400"
+        (ionInput)="onSearch($event)">
+      </ion-searchbar>
+    </div>
+
   </div>
 
 </ion-content>
