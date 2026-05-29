@@ -7,6 +7,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
+
   private supabase: SupabaseClient;
   private currentUser = new BehaviorSubject<User | null>(null);
   public authenticated = false;

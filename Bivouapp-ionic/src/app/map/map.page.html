@@ -1,31 +1,54 @@
 <ion-content [fullscreen]="true">
+  <ion-header class="ion-no-border">
+    <ion-button class="back-btn" fill="clear" (click)="goBack()">
+      <ion-icon name="chevron-back-outline"></ion-icon>
+    </ion-button>
+  </ion-header>
 
   <div id="map"></div>
 
-  <div class="bottom-overlay">
+  <ion-modal class="modal-slide"
+             [isOpen]="isModalOpen"
+             [backdropDismiss]="false"
+             [showBackdrop]="false"
+             [initialBreakpoint]="0.20"
+             [breakpoints]="[0.20, 0.5, 0.92]">
+    <ng-template>
 
-    <div class="sort-chips">
-      @for (option of sortOptions; track option.id) {
-        <div class="chip" [class.active]="selectedSort === option.id" (click)="selectSort(option.id)">
-          <ion-icon [name]="option.icon"></ion-icon>
-          <span>{{ option.label }}</span>
+      <ion-header class="ion-no-border class-modal-header">
+
+        <div class="sort-chips">
+          @for (option of sortOptions; track option.id) {
+            <div class="chip" [class.active]="selectedSort === option.id" (click)="selectSort(option.id)">
+              <ion-icon [name]="option.icon"></ion-icon>
+              <span>{{ option.label }}</span>
+            </div>
+          }
         </div>
-      }
-    </div>
 
-    <div class="search-row">
-      <ion-button class="back-btn" fill="clear" routerLink="/tabs/explore">
-        <ion-icon name="chevron-back-outline"></ion-icon>
-      </ion-button>
-      <ion-searchbar
-        [(ngModel)]="searchQuery"
-        placeholder="Rechercher un lieu..."
-        class="map-searchbar"
-        [debounce]="400"
-        (ionInput)="onSearch($event)">
-      </ion-searchbar>
-    </div>
+        <div class="search-row">
 
-  </div>
+          <ion-searchbar
+            [(ngModel)]="searchQuery"
+            placeholder="Rechercher un lieu..."
+            class="map-searchbar"
+            [debounce]="400"
+            (ionInput)="onSearch($event)">
+          </ion-searchbar>
+        </div>
+
+      </ion-header>
+
+      <ion-content class="ion-padding modal-list-content">
+        <div class="expanded-zone">
+          <ion-list lines="none" class="spots-list">
+            <ion-item><ion-label>Spot 1</ion-label></ion-item>
+            <ion-item><ion-label>Spot 2</ion-label></ion-item>
+          </ion-list>
+        </div>
+      </ion-content>
+
+    </ng-template>
+  </ion-modal>
 
 </ion-content>

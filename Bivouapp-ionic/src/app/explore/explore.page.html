@@ -30,7 +30,7 @@
         <div class="horizontal-scroll">
           @for (spot of popularSpots; track spot.id) {
             <div class="spot-card big" (click)="openSpotDetail(spot.id)">
-              <img [src]="spot.imageUrl" class="bg-img">
+              <img [src]="spot.coverUrl" class="bg-img">
               <div class="card-overlay">
                 <div class="badges-row">
                   <div class="name-badge">{{ spot.title }}</div>
@@ -57,7 +57,7 @@
         <div class="horizontal-scroll">
           @for (spot of recommendedSpots; track spot.id) {
             <div class="spot-card medium" (click)="openSpotDetail(spot.id)">
-              <img [src]="spot.imageUrl" class="bg-img">
+              <img [src]="spot.coverUrl" class="bg-img">
               <div class="card-overlay bottom">
                 <div class="dist-badge">{{ spot.distance }} km</div>
                 <div class="name-badge simple">{{ spot.title }}</div>

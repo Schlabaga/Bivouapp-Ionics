@@ -5,66 +5,58 @@
   height: 100%;
   z-index: 0;
 }
-.bottom-overlay {
-  position: fixed; /* On passe en fixed pour s'aligner sur l'écran global, pas sur le contenu qui charge */
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
+
+.ion-no-border{
+  padding-left: 10px;
+  padding-top: 10px;
+}
+
+/* --- ASTUCE POUR LES BORDS ARRONDIS DU VOLET --- */
+/* On cible la classe générée par Ionic pour l'enveloppe du Sheet Modal */
+.modal-wrapper, .sheet-target, ion-modal::part(content) {
+  border-top-left-radius: 24px !important;
+  border-top-right-radius: 24px !important;
+  overflow: hidden; /* Obligatoire pour que le contenu ne bave pas hors des angles */
+}
+
+/* Style de l'intérieur du modal */
+.modal-list-content {
+  --background: #ffffff;
+}
+
+/* Le conteneur header dans le modal */
+.class-modal-header {
+  background: #ffffff;
+  padding: 12px 12px 8px 12px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-
-  /* On applique le padding de sécurité à l'intérieur du bloc pour ne pas déplacer le bloc entier */
-  padding-left: 12px;
-  padding-right: 12px;
-  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
-
-  /* Optionnel : un petit dégradé transparent derrière pour que ce soit lisible sur la map */
-  background: linear-gradient(to top, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 30%);
-  pointer-events: none; /* Pour pouvoir scroller la map à travers le fond transparent */
+  gap: 10px; /* Espace entre les chips et la searchbar */
 }
 
-.sort-chips, .search-row {
-  pointer-events: auto;
-}
-
-/* Les chips ne changent presque pas, on enlève juste le padding inutile */
+/* --- CORRECTION DE LA SCROLLBAR DES CHIPS --- */
 .sort-chips {
+  padding-top: 13px;
   display: flex;
   gap: 10px;
   overflow-x: auto;
-  padding-bottom: 4px;
   width: 100%;
+  padding-bottom: 2px;
 
-  &::-webkit-scrollbar { display: none; }
-}
+  /* 1. Pour les navigateurs modernes / Firefox */
+  scrollbar-width: none;
 
-.chip {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: #fff;
-  color: #555;
-  padding: 8px 14px;
-  border-radius: 20px;
-  white-space: nowrap;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 600;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.12);
-  transition: 0.2s;
-  flex-shrink: 0;
+  /* 2. Pour les anciens IE / Edge */
+  -ms-overflow-style: none;
 
-  ion-icon { font-size: 16px; }
-
-  &.active {
-    background: #2f65e8;
-    color: #fff;
+  /* 3. Pour Chrome, Safari et Opera (Webkit) */
+  &::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
   }
 }
 
-/* La nouvelle ligne pour la searchbar en bas */
+/* La ligne de recherche */
 .search-row {
   display: flex;
   align-items: center;
@@ -73,27 +65,54 @@
 }
 
 .back-btn {
-  --background: #ffffff;
+  --background: #FFFF;
   --color: #000;
-  --border-radius: 50%;
-  --padding-start: 0;
-  --padding-end: 0;
+  --border-radius: 35%;
   width: 44px;
   height: 44px;
   min-width: 44px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.12);
-  border-radius: 50%;
-  flex-shrink: 0;
 }
 
 .map-searchbar {
-  --background: #ffffff;
+  --background: #f5f5f5;
   --color: #000;
-  --placeholder-color: #aaa;
   --border-radius: 14px;
-  --box-shadow: 0 2px 10px rgba(0,0,0,0.12);
-  --icon-color: #aaa;
-  padding: 0;
   height: 44px;
-  flex-grow: 1; /* Permet à la searchbar de prendre toute la place restante */
+  flex-grow: 1;
+}
+
+/* La zone qui se dévoile quand on monte le volet */
+.expanded-zone {
+  margin-top: 0;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f5f5f5;
+  color: #555;
+  padding: 8px 14px;
+  border-radius: 20px;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 600;
+  flex-shrink: 0;
+
+  &.active {
+    background: #2f65e8;
+    color: #fff;
+  }
+}
+
+/* Style de ta liste de spots */
+.spots-list {
+  background: transparent;
+  margin-top: 10px;
+
+  ion-item {
+    --background: #f9f9f9;
+    margin-bottom: 8px;
+    border-radius: 10px;
+  }
 }

@@ -2,7 +2,7 @@
 
   @if (spot) {
     <div class="main-container">
-      <img [src]="spot.imageUrl" [alt]="spot.title" class="main-img">
+      <img [src]="spot.coverUrl" [alt]="spot.title" class="main-img">
 
       <div class="header-buttons">
         <ion-button class="nav-btn back-btn" fill="clear" routerLink="/tabs/explore">
@@ -45,10 +45,10 @@
       <div class="services-section">
         <h3>Services</h3>
         <div class="services-grid">
-          @for (serviceId of spot.services; track serviceId) {
+          @for (service of spot.spot_services; track service.service_id) {
             <div class="service-card">
-              <ion-icon [name]="getServiceIcon(serviceId)"></ion-icon>
-              <span>{{ getServiceLabel(serviceId) }}</span>
+              <ion-icon [name]="getServiceIcon(service.service_id)"></ion-icon>
+              <span>{{ getServiceLabel(service.service_id) }}</span>
             </div>
           }
           <div class="service-card">

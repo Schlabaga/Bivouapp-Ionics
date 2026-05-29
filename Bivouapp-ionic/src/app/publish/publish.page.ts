@@ -116,6 +116,10 @@ export class PublishPage implements OnInit {
   }
 
   async onSubmit() {
+    const photoUrls = ['https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=600'];
+    const serviceIds = this.spotForm.get('services')?.value as string[];
+
+
     if (this.spotForm.valid) {
       const newSpot = {
         ...this.spotForm.value,
@@ -124,7 +128,7 @@ export class PublishPage implements OnInit {
         price: this.spotForm.value.price || 0 // Si vide = 0
       };
 
-      await this.spotsService.addSpot(newSpot);
+      await this.spotsService.addSpot(newSpot, photoUrls, serviceIds);
 
       const toast = await this.toastController.create({
         message: 'Spot publié avec succès !',
@@ -134,7 +138,7 @@ export class PublishPage implements OnInit {
       });
       await toast.present();
 
-      this.router.navigate(['/tabs/explore']);
+      await this.router.navigate(['/tabs/explore']);
 
       // reset
       this.spotForm.reset();

@@ -1,110 +1,112 @@
+// src/app/services/spots.ts
 import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { Spot, Service } from '../models/spot.model';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { environment } from '../environment/environment';
-import { BehaviorSubject, Observable, from } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { SupabaseService } from './supabase';
+import { AuthService } from './auth';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class SpotsService {
-  private supabase: SupabaseClient;
 
   private spotsSubject = new BehaviorSubject<Spot[]>([]);
   public spots$ = this.spotsSubject.asObservable();
 
   private availableServices: Service[] = [
-    { id: 'fire', label: 'Feu autorisé', icon: 'flame-outline' },
-    { id: 'water', label: "Point d'eau", icon: 'water-outline' },
-    { id: 'wifi', label: '4G / 5G', icon: 'wifi-outline' },
-    { id: 'electricity', label: 'Électricité', icon: 'flash-outline' },
-    { id: 'pool', label: 'Baignade', icon: 'boat-outline' },
-    { id: 'shower', label: 'Douche', icon: 'rainy-outline' },
+    { id: 'fire',        label: 'Feu autorisé', icon: 'flame-outline' },
+    { id: 'water',       label: "Point d'eau",  icon: 'water-outline' },
+    { id: 'wifi',        label: '4G / 5G',      icon: 'wifi-outline' },
+    { id: 'electricity', label: 'Électricité',  icon: 'flash-outline' },
+    { id: 'pool',        label: 'Baignade',     icon: 'boat-outline' },
+    { id: 'shower',      label: 'Douche',       icon: 'rainy-outline' },
+    { id: 'parking',     label: 'Parking',      icon: 'car-outline' },
+    { id: 'toilet',      label: 'Toilettes',    icon: 'toilet-outline' },
+    { id: 'shelter',     label: 'Abri',         icon: 'home-outline' },
   ];
 
-  constructor() {
-    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
+  constructor(
+    private supabaseService: SupabaseService,
+    private authService: AuthService
+  ) {
     this.loadInitialData();
   }
 
-  // Charge les données au démarrage
   private async loadInitialData() {
-    const { data, error } = await this.supabase
-      .from('spots')
-      .select('*');
-
-    if (!error && data) {
-      this.spotsSubject.next(data as Spot[]);
+    try {
+      const spots = await this.supabaseService.getSpots();
+      await this.applyFavorites(spots);
+    } catch (err) {
+      console.error('Erreur chargement spots :', err);
     }
   }
 
-  // 1. RÉCUPÉRER TOUS LES SPOTS (Observable pour ton code actuel)
+  // Applique isFavorite sur chaque spot selon la table favorites
+  private async applyFavorites(spots: Spot[]): Promise<void> {
+    const session = await this.authService.getSession();
+    let favoriteIds: number[] = [];
+
+    if (session?.user) {
+      favoriteIds = await this.supabaseService.getFavoriteIds(session.user.id);
+    }
+
+    const withFav = spots.map(s => ({
+      ...s,
+      isFavorite: favoriteIds.includes(s.id)
+    }));
+
+    this.spotsSubject.next(withFav);
+  }
+
   getSpots(): Observable<Spot[]> {
     return this.spots$;
   }
 
-  // 2. CHERCHER UN SPOT PAR ID
   getSpotById(id: number): Observable<Spot | undefined> {
-    // On cherche dans le tableau local déjà chargé pour la rapidité
-    return this.spots$.pipe(
-      map(spots => spots.find(s => s.id === id))
+    // D'abord on cherche en local
+    const local = this.spotsSubject.value.find(s => s.id === id);
+    if (local) {
+      return new Observable(obs => { obs.next(local); obs.complete(); });
+    }
+    // Sinon on va chercher en base
+    return new Observable(obs => {
+      this.supabaseService.getSpotById(id).then(spot => {
+        obs.next(spot ?? undefined);
+        obs.complete();
+      }).catch(err => obs.error(err));
+    });
+  }
+
+  async addSpot(spotData: Partial<Spot>, photoUrls: string[], serviceIds: string[]): Promise<void> {
+    const newSpot = await this.supabaseService.addSpot(spotData, photoUrls, serviceIds);
+    this.spotsSubject.next([newSpot, ...this.spotsSubject.value]);
+  }
+
+  async toggleFavorite(spotId: number): Promise<void> {
+    const session = await this.authService.getSession();
+    if (!session?.user) return;
+
+    const spot = this.spotsSubject.value.find(s => s.id === spotId);
+    if (!spot) return;
+
+    const newState = !spot.isFavorite;
+    await this.supabaseService.toggleFavorite(session.user.id, spotId, newState);
+
+    // Mise à jour locale
+    this.spotsSubject.next(
+      this.spotsSubject.value.map(s =>
+        s.id === spotId ? { ...s, isFavorite: newState } : s
+      )
     );
   }
 
-  // 3. AJOUTER UN SPOT SUR SUPABASE
-  async addSpot(newSpot: Spot): Promise<void> {
-    // On enlève l'ID si c'est la DB qui doit le générer
-    const { id, ...spotData } = newSpot;
-
-    const { data, error } = await this.supabase
-      .from('spots')
-      .insert([spotData]) // On envoie les données sans forcer l'ID
-      .select();
-
-    if (error) {
-      console.error("Aïe ! Supabase a refusé l'ajout :", error.message);
-      return;
-    }
-
-    if (data) {
-      console.log("Victoire ! Spot ajouté en ligne :", data[0]);
-      const currentSpots = this.spotsSubject.value;
-      this.spotsSubject.next([...currentSpots, data[0] as Spot]);
-    }
+  getAllServices(): Service[] {
+    return this.availableServices;
   }
 
-  // 4. CHANGER LE FAVORIS (Direct dans la DB)
-  async toggleFavorite(id: number): Promise<void> {
-    const spot = this.spotsSubject.value.find(s => s.id === id);
-    if (spot) {
-      const newState = !spot.isFavorite;
-
-      const { error } = await this.supabase
-        .from('spots')
-        .update({ isFavorite: newState })
-        .eq('id', id);
-
-      if (!error) {
-        // Mise à jour locale pour l'UI
-        const updatedSpots = this.spotsSubject.value.map(s =>
-          s.id === id ? { ...s, isFavorite: newState } : s
-        );
-        this.spotsSubject.next(updatedSpots);
-      }
-    }
-  }
-
-  // 5. FILTRES (toujours en local pour la perf)
   getPopularSpots(): Spot[] {
     return this.spotsSubject.value.filter(s => s.rating >= 4.5).slice(0, 5);
   }
 
   getRecommendedSpots(): Spot[] {
     return this.spotsSubject.value.filter(s => s.distance <= 50).slice(0, 5);
-  }
-
-  getAllServices(): Service[] {
-    return this.availableServices;
   }
 }

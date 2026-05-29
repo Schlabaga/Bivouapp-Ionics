@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-import { RouterModule } from '@angular/router';
+import {Router, RouterModule} from '@angular/router';
 import { Spot } from '../models/spot.model';
 import { SupabaseService } from '../services/supabase';
 import * as L from 'leaflet';
@@ -22,23 +22,41 @@ export class MapPage implements OnInit {
   map!: L.Map;
   searchQuery = '';
   selectedSort = 'all';
+  isModalOpen=true;
+  maxDistance = 25; // Distance par défaut en km
 
-  // TODO: adapter les actions selon tes besoins
-  sortOptions = [
-    { id: 'all',      label: 'Tout',        icon: 'grid-outline' },
-    { id: 'nearby',   label: 'Près de moi', icon: 'navigate-outline' },
-    { id: 'top',      label: 'Les mieux notés', icon: 'star-outline' },
-    { id: 'free',     label: 'Gratuit',     icon: 'pricetag-outline' },
-    { id: 'bivouac',  label: 'Bivouac',     icon: 'bonfire-outline' },
-    { id: 'water',    label: "Point d'eau", icon: 'water-outline' },
-    
+  servicesFilters = [
+    { id: 'water',    label: "Point d'eau", icon: 'water-outline',    checked: false },
+    { id: 'shower',   label: "Douche",      icon: 'sparkles-outline', checked: false },
+    { id: 'toilets',  label: 'Toilettes',   icon: 'man-outline',      checked: false },
+    { id: 'shelter',  label: 'Abri',        icon: 'home-outline',     checked: false },
   ];
 
-  constructor(private supabaseService: SupabaseService) {}
+
+  // TODO: adapter les actions selon les besoins
+  sortOptions = [
+    { id: 'all',      label: 'Tout',        icon: 'grid-outline' },
+    { id: 'nearby',   label: 'Près de moi', icon: 'locate-outline' },
+    // { id: 'top',   label: 'Les mieux notés', icon: 'star-outline' },
+    // { id: 'free',  label: 'Gratuit',     icon: 'pricetag-outline' },
+    { id: 'bivouac',  label: 'Bivouac',     icon: 'flame-outline' },
+    { id: 'water',    label: "Point d'eau", icon: 'water-outline' },
+    { id: 'shower',   label: "Douche",      icon: 'sparkles-outline' },
+    { id: 'toilets',  label: 'Toilettes',   icon: 'man-outline' },
+    { id: 'shelter',  label: 'Abri',        icon: 'home-outline' },
+  ];
+
+  constructor(private supabaseService: SupabaseService,
+              private router: Router) {}
 
   ngOnInit() {}
 
+
+
   async ionViewDidEnter() {
+    // On force le modal à se rouvrir dès qu'on revient sur la page !
+    this.isModalOpen = true;
+
     if (this.map) {
       this.map.invalidateSize();
       return;
@@ -58,6 +76,26 @@ export class MapPage implements OnInit {
     await this.loadSpots();
   }
 
+  async ionViewWillLeave(){
+    this.isModalOpen=false;
+  }
+
+  async goBack(){
+    this.isModalOpen=false;
+
+    setTimeout(()=>{
+      this.router.navigateByUrl('/tabs/explore');
+    },150);
+  }
+
+  applyFilters() {
+    console.log('Distance max:', this.maxDistance);
+    console.log('Services cochés:', this.servicesFilters.filter(s => s.checked));
+
+    // TODO: C'est ici que tu vas filtrer ton tableau "this.allSpots"
+    // en calculant la distance entre (this.latitude, this.longitude) et les coordonnées du spot,
+    // et en vérifiant les services requis !
+  }
   async getCurrentPosition() {
     try {
       const coords = await Geolocation.getCurrentPosition();
@@ -85,5 +123,9 @@ export class MapPage implements OnInit {
   onSearch(event: any) {
     // TODO: geocoding ou filtrage local
     console.log('Search:', this.searchQuery);
+  }
+
+  async loadSpotTypesFromSupabase(){
+    this.supabaseService
   }
 }
