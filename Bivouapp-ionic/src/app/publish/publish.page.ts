@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
@@ -12,81 +12,107 @@ import * as L from 'leaflet';
   styleUrls: ['./publish.page.scss'],
   standalone: false,
 })
-export class PublishPage implements OnInit {
+export class PublishPage implements OnDestroy {
 
   spotForm!: FormGroup;
   allServices: Service[] = [];
-  map: L.Map | undefined;
-  marker: L.Marker | undefined;
+  map: L.Map | null = null;
+  marker: L.Marker | null = null;
 
   constructor(
     private formBuilder: FormBuilder,
     private spotsService: SpotsService,
     private router: Router,
     private toastController: ToastController
-  ) {}
+  ) {
+    this.initForm();
+  }
 
-  ngOnInit() {
+  initForm() {
     this.allServices = this.spotsService.getAllServices();
 
     this.spotForm = this.formBuilder.group({
-      title: ['', [Validators.required]],
+      title: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', [Validators.required]],
       location: ['Spot inconnu'],
-      longitude: [0, [Validators.required]],
-      latitude: [0, [Validators.required]],
+      longitude: [6.6300, [Validators.required]],
+      latitude: [45.9366, [Validators.required]],
       rating: [4],
-      price: [null], // null pour afficher le placeholder
-      services: [[]],
-      imageUrl: ['https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=600'], // image par défaut
+      price: [null],
+      services: [[]], // Contiendra le tableau des IDs sélectionnés
+      imageUrl: ['https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=600'],
       type: 'bivouac',
       isFavorite: false
     });
   }
 
-  // on charge la carte quand la page s'affiche
+  // Se déclenche à chaque fois qu'on entre sur la vue
   ionViewDidEnter() {
     this.initMap();
   }
 
+  // Nettoyage si on quitte la vue sans détruire le composant
+  ionViewDidLeave() {
+    this.destroyMap();
+  }
+
+  // Sécurité ultime : destruction au démontage du composant
+  ngOnDestroy() {
+    this.destroyMap();
+  }
+
   initMap() {
-    // si la carte existe déjà, on touche à rien (sinon ça bug)
-    if (this.map) return;
+    // Si la carte existe déjà, on la vire pour éviter les conflits d'ID dans le DOM
+    this.destroyMap();
 
-    // sallanches par défaut
-    const defaultLat = 45.9366;
-    const defaultLng = 6.6300;
+    const defaultLat = this.spotForm.get('latitude')?.value || 45.9366;
+    const defaultLng = this.spotForm.get('longitude')?.value || 6.6300;
 
+    // Initialisation de la map Leaflet
     this.map = L.map('map-publish', {
-      zoomControl: false // on enleve les boutons zoom pour le style
+      zoomControl: false
     }).setView([defaultLat, defaultLng], 12);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: ''
     }).addTo(this.map);
 
-    // on crée une icône perso (sinon Leaflet bug )
+    // Icône personnalisée standardisée
     const icon = L.icon({
-      iconUrl: 'assets/icon/favicon.png', // Mets ton icône ici
+      iconUrl: 'assets/icon/favicon.png',
       iconSize: [30, 30],
       iconAnchor: [15, 15]
     });
 
-    // on ajoute un marqueur qu'on peut bouger (draggable: true)
+    // Création du marqueur déplaçable
     this.marker = L.marker([defaultLat, defaultLng], {
       icon: icon,
       draggable: true
     }).addTo(this.map);
 
-    // on met à jour le formulaire par défaut
-    this.updateCoordinates(defaultLat, defaultLng);
-
-    // QUAND ON BOUGE LE MARQUEUR
+    // Écouteur de fin de déplacement du marqueur
     this.marker.on('dragend', () => {
-      const position = this.marker!.getLatLng();
-      this.updateCoordinates(position.lat, position.lng);
-      console.log("Nouvelle position : ", position);
+      if (this.marker) {
+        const position = this.marker.getLatLng();
+        this.updateCoordinates(position.lat, position.lng);
+      }
     });
+
+    // Bonus : On peut aussi cliquer sur la carte pour déplacer le marqueur d'un coup
+    this.map.on('click', (e: L.LeafletMouseEvent) => {
+      if (this.marker) {
+        this.marker.setLatLng(e.latlng);
+        this.updateCoordinates(e.latlng.lat, e.latlng.lng);
+      }
+    });
+  }
+
+  destroyMap() {
+    if (this.map) {
+      this.map.remove();
+      this.map = null;
+      this.marker = null;
+    }
   }
 
   updateCoordinates(lat: number, lng: number) {
@@ -101,55 +127,80 @@ export class PublishPage implements OnInit {
   }
 
   isServiceSelected(serviceId: string): boolean {
-    const services = this.spotForm.get('services')?.value as string[];
+    const services = this.spotForm.get('services')?.value || [];
     return services.includes(serviceId);
   }
 
   toggleService(serviceId: string): void {
-    const currentServices = this.spotForm.get('services')?.value as string[];
-    if (currentServices.includes(serviceId)) {
-      this.spotForm.get('services')?.setValue(currentServices.filter(id => id !== serviceId));
+    // On récupère une copie propre (on ne mute pas directement le tableau d'origine)
+    const currentServices = [...(this.spotForm.get('services')?.value || [])];
+
+    const index = currentServices.indexOf(serviceId);
+    if (index > -1) {
+      currentServices.splice(index, 1); // On le retire s'il y était
     } else {
-      currentServices.push(serviceId);
-      this.spotForm.get('services')?.setValue(currentServices);
+      currentServices.push(serviceId); // On l'ajoute s'il n'y était pas
     }
+
+    // On met à jour le formulaire avec la nouvelle référence du tableau
+    this.spotForm.get('services')?.setValue(currentServices);
   }
 
   async onSubmit() {
+    if (this.spotForm.invalid) {
+      const toast = await this.toastController.create({
+        message: 'Il manque des infos, mon frate ! Vérifie le titre et la description.',
+        duration: 2500,
+        color: 'warning',
+        position: 'bottom'
+      });
+      await toast.present();
+      return;
+    }
+
     const photoUrls = ['https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=600'];
-    const serviceIds = this.spotForm.get('services')?.value as string[];
+    const serviceIds = this.spotForm.get('services')?.value || [];
 
+    const newSpot = {
+      ...this.spotForm.value,
+      id: Date.now(),
+      distance: 0,
+      price: this.spotForm.value.price || 0
+    };
 
-    if (this.spotForm.valid) {
-      const newSpot = {
-        ...this.spotForm.value,
-        id: Date.now(),
-        distance: 0,
-        price: this.spotForm.value.price || 0 // Si vide = 0
-      };
-
+    try {
+      // Envoi au service
       await this.spotsService.addSpot(newSpot, photoUrls, serviceIds);
 
       const toast = await this.toastController.create({
-        message: 'Spot publié avec succès !',
+        message: 'Le spot est en ligne, magnifique !',
         duration: 2000,
         color: 'success',
         position: 'bottom'
       });
       await toast.present();
 
-      await this.router.navigate(['/tabs/explore']);
-
-      // reset
-      this.spotForm.reset();
-    } else {
-      // si formulaire invalide les toast c une popup
-      const toast = await this.toastController.create({
-        message: 'Il manque des infos ! Vérifie le titre et la carte.',
-        duration: 2000,
-        color: 'warning'
+      // Reset propre du formulaire et redirection
+      this.spotForm.reset({
+        latitude: 45.9366,
+        longitude: 6.6300,
+        rating: 4,
+        price: null,
+        services: [],
+        imageUrl: 'https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=600',
+        type: 'bivouac',
+        isFavorite: false
       });
-      await toast.present();
+
+      await this.router.navigate(['/tabs/explore']);
+    } catch (error) {
+      console.error(error);
+      const errorToast = await this.toastController.create({
+        message: "Erreur lors de la publication... C'est le oai !",
+        duration: 2000,
+        color: 'danger'
+      });
+      await errorToast.present();
     }
   }
 }
