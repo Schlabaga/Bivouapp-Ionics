@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Spot } from '../models/spot.model';
-import { SpotsService } from '../services/spots';
+import { Spot } from '../../models/spot.model';
+import { SpotsService } from '../../services/spots';
 
 @Component({
   selector: 'app-favorites',

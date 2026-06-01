@@ -7,6 +7,8 @@ import { IonicModule } from '@ionic/angular';
 import { MapPageRoutingModule } from './map-routing.module';
 
 import { MapPage } from './map.page';
+import {SpotDetailPage} from "../spot-detail/spot-detail.page";
+import {SpotDetailPageModule} from "../spot-detail/spot-detail.module";
 
 @NgModule({
   imports: [
@@ -14,7 +16,8 @@ import { MapPage } from './map.page';
     FormsModule,
     IonicModule,
     MapPageRoutingModule,
-    MapPage
+    MapPage,
+    SpotDetailPageModule
   ]
 })
 export class MapPageModule {}

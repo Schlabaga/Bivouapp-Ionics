@@ -25,16 +25,21 @@ const routes: Routes = [
         loadChildren: () => import('../explore/explore.module').then(m => m.ExplorePageModule)
       },
       {
-        path: 'favorites',
-        loadChildren: () => import('../favorites/favorites.module').then(m => m.FavoritesPageModule)
-      },
-      {
         path: 'publish',
         loadChildren: () => import('../publish/publish.module').then(m => m.PublishPageModule)
       },
       {
-        path: 'profile',
-        loadChildren: () => import('../profile/profile.module').then(m => m.ProfilePageModule)
+        path: 'settings',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('../settings/settings.module').then(m => m.SettingsPageModule)
+          },
+          {
+            path: 'favorites',
+            loadChildren: () => import('../settings/favorites/favorites.module').then(m => m.FavoritesPageModule)
+          }
+        ]
       },
       {
         path: 'spot-detail/:id',

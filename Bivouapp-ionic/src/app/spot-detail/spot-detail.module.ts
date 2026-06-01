@@ -14,6 +14,7 @@ import { SpotDetailPage } from './spot-detail.page';
     IonicModule,
     SpotDetailPageRoutingModule,
   ],
-  declarations: [SpotDetailPage]
+  declarations: [SpotDetailPage],
+  exports: [SpotDetailPage]
 })
 export class SpotDetailPageModule {}

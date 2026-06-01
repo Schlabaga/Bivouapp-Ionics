@@ -1,19 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
-import {Router, RouterModule} from '@angular/router';
+import { IonicModule, IonModal } from '@ionic/angular';
+import { Router, RouterModule} from '@angular/router';
 import { Spot } from '../models/spot.model';
 import { SupabaseService } from '../services/supabase';
 import * as L from 'leaflet';
 import { Geolocation } from '@capacitor/geolocation';
+import {SpotDetailPageModule} from "../spot-detail/spot-detail.module";
 
 @Component({
   selector: 'app-map',
   templateUrl: './map.page.html',
   styleUrls: ['./map.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, RouterModule]
+  imports: [IonicModule, CommonModule, FormsModule, RouterModule, SpotDetailPageModule]
 })
 export class MapPage implements OnInit {
   allSpots: Spot[] = [];
@@ -24,6 +25,18 @@ export class MapPage implements OnInit {
   selectedSort = 'all';
   isModalOpen=true;
   maxDistance = 25; // Distance par défaut en km
+  markerLayer: L.Marker[] = [];
+  selectedSpot: Spot | null = null;
+
+  // On récupère le premier ion-modal trouvé dans le HTML
+  @ViewChild(IonModal) modal!: IonModal;
+
+  customIcon = L.icon({
+    iconUrl: 'assets/icon/pin.png', // Ou le chemin vers une image de pin
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34]
+  });
 
   servicesFilters = [
     { id: 'water',    label: "Point d'eau", icon: 'water-outline',    checked: false },
@@ -31,6 +44,8 @@ export class MapPage implements OnInit {
     { id: 'toilets',  label: 'Toilettes',   icon: 'man-outline',      checked: false },
     { id: 'shelter',  label: 'Abri',        icon: 'home-outline',     checked: false },
   ];
+
+
 
 
   // TODO: adapter les actions selon les besoins
@@ -68,16 +83,24 @@ export class MapPage implements OnInit {
       zoomControl: false
     }).setView([this.latitude, this.longitude], 13);
 
+    this.map.on('click', () => {
+      if (this.modal) {
+        this.modal.setCurrentBreakpoint(0.20);
+      }
+    });
+
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '© OpenStreetMap'
     }).addTo(this.map);
 
     await this.loadSpots();
+
   }
 
   async ionViewWillLeave(){
     this.isModalOpen=false;
+    this.selectedSpot= null;
   }
 
   async goBack(){
@@ -110,6 +133,7 @@ export class MapPage implements OnInit {
   async loadSpots() {
     try {
       this.allSpots = await this.supabaseService.getSpots() || [];
+      this.displaySpotsOnMap(this.allSpots);
     } catch (err) {
       console.error(err);
     }
@@ -117,6 +141,10 @@ export class MapPage implements OnInit {
 
   selectSort(id: string) {
     this.selectedSort = id;
+
+    this.allSpots.filter(spot =>{
+      return spot.type === id;
+    })
     // TODO: filtrer les marqueurs sur la carte selon l'option
   }
 
@@ -128,4 +156,43 @@ export class MapPage implements OnInit {
   async loadSpotTypesFromSupabase(){
     this.supabaseService
   }
+
+  displaySpotsOnMap(spotsToDisplay: Spot[]){
+    this.markerLayer.forEach(marker => marker.remove());
+    this.markerLayer = [];
+
+    spotsToDisplay.forEach(spot => {
+      const marker = new L.Marker([spot.latitude, spot.longitude],{ icon: this.customIcon })
+
+      marker.on("click", ()=> {
+        this.selectedSpot= spot;
+        this.maximizeModal();
+      });
+
+      marker.addTo(this.map);
+      this.markerLayer.push(marker);
+    })
+  }
+
+  closeSpotDetail(){
+    this.selectedSpot=null;
+    this.modal.setCurrentBreakpoint(0.20)
+  }
+
+  maximizeModal(){
+    if(this.modal){
+      this.modal.setCurrentBreakpoint(0.92);
+    }
+  }
+
+  checkDismiss = async () => {
+    if (this.modal) {
+      // 1. On force le modal à redescendre au breakpoint minimum (0.20)
+      await this.modal.setCurrentBreakpoint(0.20);
+    }
+
+    // 2. TRÈS IMPORTANT : On renvoie false pour dire au modal "Ne te ferme pas !"
+    return false;
+  };
+
 }

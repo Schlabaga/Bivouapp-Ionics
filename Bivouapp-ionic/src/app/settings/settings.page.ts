@@ -1,15 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { User } from '../models/user.model';
 import { UsersService } from '../services/users';
+import {Router} from "@angular/router";
 import {TimeAgoPipe} from "../pipes/timeago-pipe";
 
 @Component({
-  selector: 'app-profile',
-  templateUrl: './profile.page.html',
-  styleUrls: ['./profile.page.scss'],
+  selector: 'app-settings',
+  templateUrl: './settings.page.html',
+  styleUrls: ['./settings.page.scss'],
   standalone: false,
 })
-export class ProfilePage implements OnInit {
+export class SettingsPage implements OnInit {
 
   user: User | undefined;
 

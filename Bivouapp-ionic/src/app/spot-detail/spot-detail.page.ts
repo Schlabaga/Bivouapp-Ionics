@@ -1,8 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import {Component, OnInit, OnDestroy, Input, Output, EventEmitter} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Spot, Service } from '../models/spot.model';
 import { SpotsService } from '../services/spots';
 import * as L from 'leaflet';
+
+
 
 @Component({
   selector: 'app-spot-detail',
@@ -10,12 +12,17 @@ import * as L from 'leaflet';
   styleUrls: ['./spot-detail.page.scss'],
   standalone: false,
 })
+
+
 export class SpotDetailPage implements OnInit, OnDestroy {
 
+  @Input() spotId?:number;
+  @Output() closed = new EventEmitter<void>();
   spot?: Spot;
   allServices: Service[] = [];
-  showMap = true;
+  showMap = false;
   map: L.Map | undefined;
+  currentImageIndex = 0;
 
   constructor(
     private route: ActivatedRoute,
@@ -23,14 +30,20 @@ export class SpotDetailPage implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    // on récupère l'id dans l'url pour savoir quel spot afficher
-    const spotId = Number(this.route.snapshot.paramMap.get('id'));
-
-    if (spotId) {
-      this.loadSpot(spotId);
-    }
-    // on charge la liste des services
+    // 1. On charge d'abord la liste des services (communs aux deux cas)
     this.allServices = this.spotsService.getAllServices();
+
+    // 2. On regarde si on a reçu l'ID par l'Input (Cas du volet sur la carte)
+    if (this.spotId) {
+      this.loadSpot(this.spotId);
+    }
+    // 3. Sinon, on va le chercher dans l'URL (Cas de la page seule)
+    else {
+      const urlId = Number(this.route.snapshot.paramMap.get('id'));
+      if (urlId) {
+        this.loadSpot(urlId);
+      }
+    }
   }
 
   // quand on quitte la page on détruit la carte
@@ -124,5 +137,14 @@ export class SpotDetailPage implements OnInit, OnDestroy {
       fillOpacity: 1,
       radius: 5
     }).addTo(this.map);
+  }
+  closeSheet(){
+    this.closed.emit();
+
+  }
+
+  onCarouselScroll(event: any) {
+    const container = event.target;
+    this.currentImageIndex = Math.round(container.scrollLeft / container.clientWidth);
   }
 }

@@ -42,6 +42,7 @@ export class ExplorePage implements OnInit, ViewWillEnter {
   // Ça recharge les données quand on revient sur la page (utile si on a ajouté un spot entre temps)
   async ionViewWillEnter() {
     await this.loadSpotsFromSupabase();
+    console.log(this.popularSpots);
   }
 
   async loadSpotsFromSupabase() {

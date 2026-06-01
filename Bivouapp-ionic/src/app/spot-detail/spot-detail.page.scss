@@ -4,34 +4,43 @@ ion-content {
 
 .main-container {
   position: relative;
-  height: 350px; /* grande image */
+  height: 300px; /* grande image */
   width: 100%;
+
 }
 
 .main-img {
-  width: 100%;
+  min-width: 100%;          /* chaque photo doit prendre tout l'écran */
+  scroll-snap-align: start; /* Dit au scroll de s'aimanter pile au début de l'image */
+
+  padding: 20px;
   height: 100%;
+  border-radius: 50px;
   object-fit: cover;
 }
 
 .header-buttons {
-  position: absolute;
-  top: 50px;
-  left: 20px;
-  right: 20px;
+  width: 100%;
   display: flex;
   justify-content: space-between;
   z-index: 10;
+  position: sticky     !important;
+  top:0;
+  padding-left: 30px;
+  padding-right: 30px;
+  padding-top: 15px;
+  box-sizing: border-box;
 }
 
 .nav-btn {
-  --background: rgba(255, 255, 255, 0.9);
+  --border-radius: 16px;
+  --background: rgba(255, 255, 255, 255);
   --padding-start: 0;
   --padding-end: 0;
   width: 45px;
   height: 45px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   --color: #000;
+
 }
 
 
@@ -40,9 +49,10 @@ ion-content {
   padding: 20px;
   border-radius: 30px 30px 0 0;
   background: white;
-  margin-top: -30px; /* on fait chevaucher l'image */
   position: relative;
   z-index: 5;
+  margin-top: -20px; /* 👈 Tu l'as enlevé ! */
+  margin-bottom: 60px;
 }
 
 .title-section {
@@ -154,11 +164,11 @@ ion-content {
   }
 }
 
-
-ion-footer {
+/* Nouveau style propre pour le faux-footer qui scrolle naturellement */
+.custom-footer-block {
   background: white;
-  box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
-  padding: 10px 20px 30px 20px;
+  padding: 20px 0 10px 0;
+  margin-top: 30px;
 
   .footer-content {
     display: flex;
@@ -185,4 +195,40 @@ ion-footer {
     --background: #2f65e8;
     text-transform: none;
   }
+}
+
+.carousel-track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory; /* 👈 Effet "aimant" d'Airbnb sur chaque photo */
+  scroll-behavior: smooth;  /* 👈 Transitions fluides */
+  width: 100%;
+  height: 100%;
+
+  /* Optionnel : pour cacher la barre de scroll moche sur mobile */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.carousel-dots{
+  position: absolute;
+  bottom: 35px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap:5px;
+  z-index: 15;
+}
+
+.dot{
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transition: opacity 0.3s ease;
+}
+
+.dot.active{
+  background: #fff;
 }
