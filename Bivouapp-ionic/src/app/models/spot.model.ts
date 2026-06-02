@@ -14,6 +14,12 @@ export interface Service {
   icon: string;
 }
 
+export interface Lodging {
+  id: string;
+  label: string;
+  icon: string;
+}
+
 export interface Spot {
   id: number;
   title: string;
@@ -22,7 +28,7 @@ export interface Spot {
   rating: number;
   distance: number;
   location: string;
-  type: 'bivouac' | 'camping' | 'refuge' | "point d'eau" | 'abri';
+  type: 'bivouac' | 'camping' | 'shelter' | "water" | 'alpine hut' ;
   latitude: number;
   longitude: number;
   created_by?: string;

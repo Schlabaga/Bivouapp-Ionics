@@ -6,9 +6,16 @@
         <ion-icon [name]="spot.isFavorite ? 'heart' : 'heart-outline'"
                   [color]="spot.isFavorite ? 'danger' : 'medium'"></ion-icon>
       </ion-button>
-      <ion-button class="nav-btn back-btn" fill="clear" (click)="closeSheet()">
-        <ion-icon name="close-outline"></ion-icon>
-      </ion-button>
+      @if(spotId){
+        <ion-button class="nav-btn back-btn" fill="clear" (click)="closeSheet()">
+          <ion-icon name="close-outline"></ion-icon>
+        </ion-button>
+      } @else {
+        <ion-button class="nav-btn back-btn" fill="clear" (click)="goBack()" >
+          <ion-icon name="close-outline"></ion-icon>
+        </ion-button>
+      }
+
     </div>
 
     <div class="main-container">

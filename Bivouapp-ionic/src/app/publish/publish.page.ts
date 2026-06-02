@@ -1,9 +1,10 @@
+// src/app/publish/publish.page.ts
 import { Component, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ToastController } from '@ionic/angular';
+import { ToastController, LoadingController } from '@ionic/angular';
 import { SpotsService } from '../services/spots';
-import { Service } from '../models/spot.model';
+import { Lodging, Service } from '../models/spot.model';
 import * as L from 'leaflet';
 
 @Component({
@@ -16,6 +17,7 @@ export class PublishPage implements OnDestroy {
 
   spotForm!: FormGroup;
   allServices: Service[] = [];
+  allLodging: Lodging[] = [];
   map: L.Map | null = null;
   marker: L.Marker | null = null;
 
@@ -23,52 +25,52 @@ export class PublishPage implements OnDestroy {
     private formBuilder: FormBuilder,
     private spotsService: SpotsService,
     private router: Router,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private loadingController: LoadingController
   ) {
     this.initForm();
   }
 
   initForm() {
     this.allServices = this.spotsService.getAllServices();
+    this.allLodging = this.spotsService.getAllLodging();
 
     this.spotForm = this.formBuilder.group({
-      title: ['', [Validators.required, Validators.minLength(3)]],
-      description: ['', [Validators.required]],
-      location: ['Spot inconnu'],
+      title: [''], // Optionnel, géré au submit si vide
+      description: ['', [Validators.required]], // Toujours requis !
+      type: ['bivouac', [Validators.required]], // On met par défaut l'ID 'bivouac' qui est dans ton tableau propre
       longitude: [6.6300, [Validators.required]],
       latitude: [45.9366, [Validators.required]],
       rating: [4],
-      price: [null],
-      services: [[]], // Contiendra le tableau des IDs sélectionnés
+      accessibleByTrain: [false],
+      isPaid: [false],
+      price: [null], // Validé dynamiquement si isPaid passe à true
+      isForbiddenZone: [false],
+      services: [[]],
       imageUrl: ['https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=600'],
-      type: 'bivouac',
+      location: ['Spot inconnu'],
       isFavorite: false
     });
   }
 
-  // Se déclenche à chaque fois qu'on entre sur la vue
   ionViewDidEnter() {
     this.initMap();
   }
 
-  // Nettoyage si on quitte la vue sans détruire le composant
   ionViewDidLeave() {
     this.destroyMap();
   }
 
-  // Sécurité ultime : destruction au démontage du composant
   ngOnDestroy() {
     this.destroyMap();
   }
 
   initMap() {
-    // Si la carte existe déjà, on la vire pour éviter les conflits d'ID dans le DOM
     this.destroyMap();
 
     const defaultLat = this.spotForm.get('latitude')?.value || 45.9366;
     const defaultLng = this.spotForm.get('longitude')?.value || 6.6300;
 
-    // Initialisation de la map Leaflet
     this.map = L.map('map-publish', {
       zoomControl: false
     }).setView([defaultLat, defaultLng], 12);
@@ -77,20 +79,17 @@ export class PublishPage implements OnDestroy {
       attribution: ''
     }).addTo(this.map);
 
-    // Icône personnalisée standardisée
     const icon = L.icon({
       iconUrl: 'assets/icon/favicon.png',
       iconSize: [30, 30],
       iconAnchor: [15, 15]
     });
 
-    // Création du marqueur déplaçable
     this.marker = L.marker([defaultLat, defaultLng], {
       icon: icon,
       draggable: true
     }).addTo(this.map);
 
-    // Écouteur de fin de déplacement du marqueur
     this.marker.on('dragend', () => {
       if (this.marker) {
         const position = this.marker.getLatLng();
@@ -98,13 +97,61 @@ export class PublishPage implements OnDestroy {
       }
     });
 
-    // Bonus : On peut aussi cliquer sur la carte pour déplacer le marqueur d'un coup
     this.map.on('click', (e: L.LeafletMouseEvent) => {
       if (this.marker) {
         this.marker.setLatLng(e.latlng);
         this.updateCoordinates(e.latlng.lat, e.latlng.lng);
       }
     });
+  }
+
+  // Capte la position GPS actuelle du smartphone
+  async getCurrentLocation() {
+    if (!navigator.geolocation) {
+      this.showToast("La géolocalisation n'est pas supportée par ton tel mon frate.", 'danger');
+      return;
+    }
+
+    const loading = await this.loadingController.create({
+      message: 'Recherche de ton signal GPS...',
+      spinner: 'crescent'
+    });
+    await loading.present();
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+
+        this.updateCoordinates(lat, lng);
+
+        if (this.map && this.marker) {
+          this.marker.setLatLng([lat, lng]);
+          this.map.setView([lat, lng], 15);
+        }
+        loading.dismiss();
+      },
+      (error) => {
+        console.error(error);
+        loading.dismiss();
+        this.showToast("Impossible de choper ta position, vérifie tes autorisations !", 'warning');
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }
+
+  // Active/Désactive la validation du prix selon si c'est payant
+  onPaidToggleChange(event: any) {
+    const isPaid = event.detail.checked;
+    const priceControl = this.spotForm.get('price');
+
+    if (isPaid) {
+      priceControl?.setValidators([Validators.required, Validators.min(0.1)]);
+    } else {
+      priceControl?.clearValidators();
+      priceControl?.setValue(null);
+    }
+    priceControl?.updateValueAndValidity();
   }
 
   destroyMap() {
@@ -126,81 +173,104 @@ export class PublishPage implements OnDestroy {
     this.spotForm.get('rating')?.setValue(rating);
   }
 
+  // === GESTION DES LOGDINGS (Sélection unique) ===
+  selectLodging(lodgingId: string): void {
+    this.spotForm.get('type')?.setValue(lodgingId);
+  }
+
+  isLodgingSelected(lodgingId: string): boolean {
+    return this.spotForm.get('type')?.value === lodgingId;
+  }
+
+  // === GESTION DES SERVICES (Sélection multiple) ===
   isServiceSelected(serviceId: string): boolean {
     const services = this.spotForm.get('services')?.value || [];
     return services.includes(serviceId);
   }
 
   toggleService(serviceId: string): void {
-    // On récupère une copie propre (on ne mute pas directement le tableau d'origine)
     const currentServices = [...(this.spotForm.get('services')?.value || [])];
-
     const index = currentServices.indexOf(serviceId);
     if (index > -1) {
-      currentServices.splice(index, 1); // On le retire s'il y était
+      currentServices.splice(index, 1);
     } else {
-      currentServices.push(serviceId); // On l'ajoute s'il n'y était pas
+      currentServices.push(serviceId);
     }
-
-    // On met à jour le formulaire avec la nouvelle référence du tableau
     this.spotForm.get('services')?.setValue(currentServices);
   }
 
   async onSubmit() {
     if (this.spotForm.invalid) {
-      const toast = await this.toastController.create({
-        message: 'Il manque des infos, mon frate ! Vérifie le titre et la description.',
-        duration: 2500,
-        color: 'warning',
-        position: 'bottom'
-      });
-      await toast.present();
+      this.showToast('Il manque des informations obligatoires (description ou coordonnées) !', 'warning');
       return;
     }
 
-    const photoUrls = ['https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=600'];
+    const loading = await this.loadingController.create({
+      message: 'Enregistrement du spot...',
+      spinner: 'crescent'
+    });
+    await loading.present();
+
+    const photoUrls = [this.spotForm.value.imageUrl];
     const serviceIds = this.spotForm.get('services')?.value || [];
 
-    const newSpot = {
-      ...this.spotForm.value,
-      id: Date.now(),
-      distance: 0,
-      price: this.spotForm.value.price || 0
+    // Récupère l'étiquette (Label) propre pour faire un titre automatique si l'utilisateur n'en met pas
+    const selectedLodging = this.allLodging.find(l => l.id === this.spotForm.value.type);
+    const typeLabel = selectedLodging ? selectedLodging.label : 'Spot Nature';
+    const finalTitle = this.spotForm.value.title?.trim() || `${typeLabel} inédit`;
+
+    // Prépare l'objet propre pour l'API Supabase
+    const spotData: Partial<any> = {
+      title: finalTitle,
+      description: this.spotForm.value.description,
+      type: this.spotForm.value.type, // Enverra par exemple 'alpine_hut', match parfait avec ton enum et la BDD SQL !
+      latitude: this.spotForm.value.latitude,
+      longitude: this.spotForm.value.longitude,
+      rating: this.spotForm.value.rating,
+      location: this.spotForm.value.location,
+      price: this.spotForm.value.isPaid ? this.spotForm.value.price : 0
     };
 
     try {
-      // Envoi au service
-      await this.spotsService.addSpot(newSpot, photoUrls, serviceIds);
+      // Envoi des données cleans à Supabase
+      await this.spotsService.addSpot(spotData, photoUrls, serviceIds);
 
-      const toast = await this.toastController.create({
-        message: 'Le spot est en ligne, magnifique !',
-        duration: 2000,
-        color: 'success',
-        position: 'bottom'
-      });
-      await toast.present();
+      loading.dismiss();
+      await this.showToast('Le spot est partagé avec la commu, parfait !', 'success');
 
-      // Reset propre du formulaire et redirection
+      // Reset total
       this.spotForm.reset({
+        title: '',
+        description: '',
+        type: 'bivouac',
         latitude: 45.9366,
         longitude: 6.6300,
         rating: 4,
+        accessibleByTrain: false,
+        isPaid: false,
         price: null,
+        isForbiddenZone: false,
         services: [],
         imageUrl: 'https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=600',
-        type: 'bivouac',
+        location: 'Spot inconnu',
         isFavorite: false
       });
 
       await this.router.navigate(['/tabs/explore']);
     } catch (error) {
       console.error(error);
-      const errorToast = await this.toastController.create({
-        message: "Erreur lors de la publication... C'est le oai !",
-        duration: 2000,
-        color: 'danger'
-      });
-      await errorToast.present();
+      await loading.dismiss();
+      await this.showToast("Erreur système lors de la publication... C'est le oai !", 'danger');
     }
+  }
+
+  private async showToast(message: string, color: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2500,
+      color,
+      position: 'bottom'
+    });
+    await toast.present();
   }
 }

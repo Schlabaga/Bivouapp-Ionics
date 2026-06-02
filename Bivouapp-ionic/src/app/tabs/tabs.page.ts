@@ -13,7 +13,7 @@ export class TabsPage {
 
   ionTabsWillChange(event:any){
     if(event.tab){
-      if(event.tab == 'map'){
+      if(event.tab == 'map' || event.tab=='publish'){
         this.showTabBar= false;
       } else{
         this.showTabBar= true;

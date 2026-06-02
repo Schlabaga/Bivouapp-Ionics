@@ -1,7 +1,8 @@
 import {Component, OnInit, OnDestroy, Input, Output, EventEmitter} from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute,  } from '@angular/router';
 import { Spot, Service } from '../models/spot.model';
 import { SpotsService } from '../services/spots';
+import {NavController} from "@ionic/angular";
 import * as L from 'leaflet';
 
 
@@ -23,10 +24,12 @@ export class SpotDetailPage implements OnInit, OnDestroy {
   showMap = false;
   map: L.Map | undefined;
   currentImageIndex = 0;
+  from="";
 
   constructor(
     private route: ActivatedRoute,
-    private spotsService: SpotsService
+    private spotsService: SpotsService,
+    private navCtrl: NavController
   ) {}
 
   ngOnInit() {
@@ -40,6 +43,7 @@ export class SpotDetailPage implements OnInit, OnDestroy {
     // 3. Sinon, on va le chercher dans l'URL (Cas de la page seule)
     else {
       const urlId = Number(this.route.snapshot.paramMap.get('id'));
+      this.from = String(this.route.snapshot.paramMap.get('from'));
       if (urlId) {
         this.loadSpot(urlId);
       }
@@ -140,7 +144,10 @@ export class SpotDetailPage implements OnInit, OnDestroy {
   }
   closeSheet(){
     this.closed.emit();
+  }
 
+  goBack(){
+    this.navCtrl.back();
   }
 
   onCarouselScroll(event: any) {

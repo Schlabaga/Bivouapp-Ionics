@@ -1,125 +1,166 @@
-ion-content, ion-toolbar { --background: #ffffff; }
+// Conteneur de la carte Leaflet
+.map-container {
+  position: relative;
+  margin-bottom: 20px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 
-ion-title, ion-back-button { color: #000; }
-ion-title { font-weight: 700; }
+  #map-publish {
+    width: 100%;
+    height: 220px;
+    z-index: 1;
+  }
 
-.publish-container { padding: 20px; }
-
-// les étiquettes au dessus des champs
-label {
-  display: block;
-  font-weight: 700;
-  color: #000;
-  margin: 20px 0 8px;
-}
-
-// style des boites de texte grises
-.custom-input {
-  --background: #F6F8FC;
-  --color: #000;
-  --padding-start: 15px;
-  border-radius: 12px;
-  margin-bottom: 10px;
-}
-
-// pour que la description soit plus grande
-ion-textarea.custom-input { min-height: 120px; }
-
-// la zone pour la carte
-#map-publish {
-  height: 200px;
-  border-radius: 15px;
-  border: 1px solid #eee;
-  margin-bottom: 10px;
-}
-
-// alignement des étoiles
-.stars-row {
-  display: flex;
-  gap: 10px;
-  ion-icon {
-    font-size: 30px;
-    color: #ddd; // gris de base
-    &.active {
-      color: #ffc409; } // jaune quand c'est cliqué
+  .gps-btn {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    z-index: 10;
+    margin: 0;
+    --box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   }
 }
 
-// champ pour le prix
-.price-input-wrapper {
-  background: #F6F8FC;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  ion-input { --color: #000; }
-  .currency {
-    padding-right: 15px;
+// Style des listes de formulaires épaisses et modernes
+.form-list {
+  background: transparent;
+  padding: 0;
+
+  .custom-input {
+    --background: var(--ion-color-step-100, #f4f5f8);
+    border-radius: 12px;
+    margin-bottom: 14px;
+    padding-inline-start: 12px;
+
+    ion-label {
+      font-weight: 600;
+      color: var(--ion-color-medium);
+      margin-bottom: 6px;
+    }
+
+    ion-input, ion-textarea {
+      --padding-top: 8px;
+      --padding-bottom: 8px;
+    }
+  }
+}
+
+// Structure des titres de sections
+.section-container {
+  margin: 24px 0 16px 0;
+
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--ion-color-dark);
+    padding-left: 4px;
+  }
+}
+
+// GRILLE MAGIQUE : Les hébergements et les services en puces d'application
+.grid-selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); // 3 colonnes égales sur mobile
+  gap: 10px;
+
+  .selector-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--ion-color-step-50, #ffffff);
+    border: 2px solid var(--ion-color-step-200, #e0e0e0);
+    border-radius: 14px;
+    padding: 12px 6px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+
+    ion-icon {
+      font-size: 1.6rem;
+      margin-bottom: 6px;
+      color: var(--ion-color-medium);
+      transition: transform 0.2s ease;
+    }
+
+    .chip-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--ion-color-step-800, #333);
+      line-height: 1.2;
+    }
+
+    // Effet au clic / Sélectionné
+    &.selected {
+      background: rgba(var(--ion-color-primary-rgb), 0.08);
+      border-color: var(--ion-color-primary);
+      box-shadow: 0 4px 10px rgba(var(--ion-color-primary-rgb), 0.15);
+
+      ion-icon {
+        color: var(--ion-color-primary);
+        transform: scale(1.1);
+      }
+
+      .chip-label {
+        color: var(--ion-color-primary);
+        font-weight: 700;
+      }
+    }
+
+    // Couleur alternative au choix pour les services sélectionnés
+    &.service-chip.selected {
+      background: rgba(var(--ion-color-secondary-rgb), 0.08);
+      border-color: var(--ion-color-secondary);
+
+      ion-icon { color: var(--ion-color-secondary); }
+      .chip-label { color: var(--ion-color-secondary); }
+    }
+  }
+}
+
+// Toggles et inputs annexes
+.toggle-list {
+  background: var(--ion-color-step-50, #ffffff);
+  border-radius: 14px;
+  margin: 16px 0;
+  overflow: hidden;
+
+  ion-item {
+    --padding-start: 12px;
+  }
+
+  .price-input {
+    --background: rgba(var(--ion-color-success-rgb), 0.04);
     font-weight: bold;
-    color: #666; }
-}
-
-// scroll horizontal pour les services
-.services-scroll {
-  display: flex;
-  overflow-x: auto;
-  gap: 10px;
-  padding-bottom: 10px;
-  &::-webkit-scrollbar { display: none; } // on cache la barre de scroll
-}
-
-// les petits carrés de services
-.service-box {
-  cursor: pointer;
-  min-width: 80px;
-  height: 80px;
-  background: #F6F8FC;
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: #888;
-
-  // quand on sélectionne un service
-  &.selected {
-    background: #e6f0ff;
-    border: 2px solid #2f65e8;
-    color: #2f65e8;
-  }
-
-  ion-icon { font-size: 24px; margin-bottom: 5px; }
-  span { font-size: 11px; font-weight: 600; }
-}
-
-// gestion des photos
-.media-preview {
-  display: flex;
-  gap: 10px;
-  .img-box {
-    width: 70px; height: 70px;
-    border-radius: 10px;
-    background: #F6F8FC;
-    overflow: hidden;
-    display: flex; align-items: center; justify-content: center;
-    img { width: 100%;
-      height: 100%;
-      object-fit: cover;
-      cursor: pointer}
-
-    // la boite pour ajouter une photo
-    &.add { border: 2px dashed #ccc;
-      color: #ccc;
-      font-size: 24px; }
   }
 }
 
-// le gros bouton bleu en bas
+// Gros bouton de publication style "Aventure"
 .submit-btn {
-  margin: 40px 0 20px;
-  --background: #2f65e8;
-  --border-radius: 12px;
-  height: 50px;
-  font-weight: bold;
-  color: white;
+  margin-top: 24px;
+  margin-bottom: 32px;
+  --border-radius: 14px;
+  --padding-top: 16px;
+  --padding-bottom: 16px;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+}
 
+// Animation légère pour l'affichage du champ prix
+.animate__animated {
+  animation-duration: 0.3s;
+  animation-fill-mode: both;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate__fadeIn {
+  animation-name: fadeIn;
 }

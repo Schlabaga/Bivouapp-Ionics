@@ -1,96 +1,84 @@
-<ion-header class="ion-no-border">
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/explore" text="" icon="chevron-back"></ion-back-button>
-    </ion-buttons>
-    <ion-title>Publier un spot</ion-title>
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Partager un spot</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <div class="publish-container">
-    <form [formGroup]="spotForm" (ngSubmit)="onSubmit()">
+<ion-content class="ion-padding">
+  <form [formGroup]="spotForm" (ngSubmit)="onSubmit()">
 
-      <div class="input-group">
-        <label>Titre</label>
-        <ion-input class="custom-input" formControlName="title" placeholder="Ajouter un titre"></ion-input>
-      </div>
 
-      <div class="input-group">
-        <label>Description</label>
-        <ion-textarea class="custom-input" formControlName="description" placeholder="Ajouter une description..." rows="4"></ion-textarea>
-      </div>
-
-      <div class="input-group">
-        <label>Localisation</label>
-        <div class="map-wrapper">
-          <div id="map-publish"></div>
-          <div class="map-overlay">
-            <ion-icon name="location"></ion-icon>
-
-            <span>
-              {{ spotForm.get('latitude')?.value | number:'1.2-2' }},
-              {{ spotForm.get('longitude')?.value | number:'1.2-2' }}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <ion-row>
-        <ion-col size="6">
-          <div class="input-group">
-            <label>Note</label>
-            <div class="stars-row">
-              @for (s of [1,2,3,4,5]; track s) {
-                <ion-icon
-                  [name]="spotForm.get('rating')?.value >= s ? 'star' : 'star-outline'"
-                  [class.active]="spotForm.get('rating')?.value >= s"
-                  (click)="setRating(s)">
-                </ion-icon>
-              }
-            </div>
-          </div>
-        </ion-col>
-        <ion-col size="6">
-          <div class="input-group">
-            <label>Prix</label>
-            <div class="price-input-wrapper">
-              <ion-input type="number" formControlName="price" placeholder="Prix"></ion-input>
-              <span class="currency">€</span>
-            </div>
-          </div>
-        </ion-col>
-      </ion-row>
-
-      <div class="input-group">
-        <label>Services</label>
-        <div class="services-scroll">
-          @for (service of allServices; track service.id) {
-            <div class="service-box"
-                 [class.selected]="isServiceSelected(service.id)"
-                 (click)="toggleService(service.id)">
-              <ion-icon [name]="service.icon"></ion-icon>
-              <span>{{ service.label }}</span>
-            </div>
-          }
-        </div>
-      </div>
-
-      <div class="input-group">
-        <div class="media-header">
-          <ion-icon name="add-circle-outline"></ion-icon>
-          <span>Ajouter médias</span>
-        </div>
-        <div class="media-preview">
-          <div class="img-box add"><ion-icon name="camera"></ion-icon></div>
-          <div class="img-box"><img src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=200"></div>
-        </div>
-      </div>
-
-      <ion-button expand="block" type="submit" class="submit-btn" [disabled]="spotForm.invalid">
-        Publier le spot
-      </ion-button>
-
-    </form>
+  <div class="map-container">
+    <div id="map-publish"></div>
+    <ion-button class="gps-btn" expand="block" shape="round" color="secondary" (click)="getCurrentLocation()">
+      <ion-icon slot="start" name="locate-outline"></ion-icon>
+      Me géolocaliser
+    </ion-button>
   </div>
+
+  <ion-list lines="none" class="form-list">
+    <ion-item class="custom-input">
+      <ion-label position="stacked">Nom du spot (Optionnel)</ion-label>
+      <ion-input formControlName="title" placeholder="Ex: Clairière aux étoiles"></ion-input>
+    </ion-item>
+
+    <ion-item class="custom-input">
+      <ion-label position="stacked">Description *</ion-label>
+      <ion-textarea formControlName="description" placeholder="Dis-nous en plus sur ce coin de paradis... (Obligatoire)" rows="3"></ion-textarea>
+    </ion-item>
+  </ion-list>
+
+  <div class="section-container">
+    <h3 class="section-title">Quel type d'hébergement ?</h3>
+    <div class="grid-selector">
+      <div *ngFor="let item of allLodging"
+           [class.selected]="isLodgingSelected(item.id)"
+           (click)="selectLodging(item.id)"
+           class="selector-chip">
+        <ion-icon [name]="item.icon"></ion-icon>
+        <span class="chip-label">{{ item.label }}</span>
+      </div>
+    </div>
+  </div>
+
+  <ion-list lines="full" class="toggle-list">
+    <ion-item>
+      <ion-icon slot="start" name="train-outline" color="medium"></ion-icon>
+      <ion-label>Accessible en train</ion-label>
+      <ion-toggle formControlName="accessibleByTrain"></ion-toggle>
+    </ion-item>
+
+    <ion-item>
+      <ion-icon slot="start" name="cash-outline" color="medium"></ion-icon>
+      <ion-label>Accès payant</ion-label>
+      <ion-toggle formControlName="isPaid" (ionChange)="onPaidToggleChange($event)"></ion-toggle>
+    </ion-item>
+
+    <ion-item *ngIf="spotForm.get('isPaid')?.value" class="price-input animate__animated animate__fadeIn">
+      <ion-label slot="start">Tarif (€)</ion-label>
+      <ion-input type="number" formControlName="price" placeholder="0.00"></ion-input>
+    </ion-item>
+  </ion-list>
+
+  <div class="section-container">
+    <h3 class="section-title">Services disponibles sur place</h3>
+    <div class="grid-selector">
+      <div *ngFor="let service of allServices"
+           [class.selected]="isServiceSelected(service.id)"
+           (click)="toggleService(service.id)"
+           class="selector-chip service-chip">
+        <ion-icon [name]="service.icon"></ion-icon>
+        <span class="chip-label">{{ service.label }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ion-margin-top">
+    <ion-button type="submit" expand="block" color="success" class="submit-btn">
+      <ion-icon slot="start" name="cloud-upload-outline"></ion-icon>
+      Publier le spot
+    </ion-button>
+  </div>
+
+  </form>
 </ion-content>

@@ -1,7 +1,7 @@
 // src/app/services/spots.ts
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Spot, Service } from '../models/spot.model';
+import {Spot, Service, Lodging} from '../models/spot.model';
 import { SupabaseService } from './supabase';
 import { AuthService } from './auth';
 
@@ -20,7 +20,15 @@ export class SpotsService {
     { id: 'shower',      label: 'Douche',       icon: 'rainy-outline' },
     { id: 'parking',     label: 'Parking',      icon: 'car-outline' },
     { id: 'toilet',      label: 'Toilettes',    icon: 'toilet-outline' },
-    { id: 'shelter',     label: 'Abri',         icon: 'home-outline' },
+  ];
+
+  private lodging: Lodging[] = [
+    { id: 'alpine_hut', label: 'Refuge', icon: 'business-outline' },
+    { id: 'wilderness_hut', label: 'Abri', icon: 'home-outline' },
+    { id: 'bivouac', label: 'Bivouac', icon: 'tent-outline' },
+    { id: 'camp_site', label: 'Camping', icon: 'bonfire-outline' },
+    { id: 'gite_hostel', label: 'Gîte d\'étape', icon: 'bed-outline' },
+    { id: 'chalet', label: 'Chalet', icon: 'leaf-outline' }
   ];
 
   constructor(
@@ -100,6 +108,10 @@ export class SpotsService {
 
   getAllServices(): Service[] {
     return this.availableServices;
+  }
+
+  getAllLodging() : Lodging[]{
+    return this.lodging;
   }
 
   getPopularSpots(): Spot[] {
