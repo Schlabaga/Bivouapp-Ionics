@@ -6,6 +6,10 @@ import { ToastController, LoadingController } from '@ionic/angular';
 import { SpotsService } from '../services/spots';
 import { Lodging, Service } from '../models/spot.model';
 import * as L from 'leaflet';
+import { Camera } from '@capacitor/camera';
+import {NavController} from "@ionic/angular";
+
+
 
 @Component({
   selector: 'app-publish',
@@ -20,13 +24,17 @@ export class PublishPage implements OnDestroy {
   allLodging: Lodging[] = [];
   map: L.Map | null = null;
   marker: L.Marker | null = null;
+  selectedImage: string | undefined;
+  imagesUrl: String[] =[];
 
   constructor(
     private formBuilder: FormBuilder,
     private spotsService: SpotsService,
     private router: Router,
     private toastController: ToastController,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private navCtrl: NavController
+
   ) {
     this.initForm();
   }
@@ -47,14 +55,16 @@ export class PublishPage implements OnDestroy {
       price: [null], // Validé dynamiquement si isPaid passe à true
       isForbiddenZone: [false],
       services: [[]],
-      imageUrl: ['https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=600'],
+      imagesUrl: [[]],
       location: ['Spot inconnu'],
       isFavorite: false
     });
   }
 
   ionViewDidEnter() {
-    this.initMap();
+    setTimeout(() => {
+      this.initMap();
+    }, 50);
   }
 
   ionViewDidLeave() {
@@ -64,12 +74,15 @@ export class PublishPage implements OnDestroy {
   ngOnDestroy() {
     this.destroyMap();
   }
-
   initMap() {
     this.destroyMap();
 
     const defaultLat = this.spotForm.get('latitude')?.value || 45.9366;
     const defaultLng = this.spotForm.get('longitude')?.value || 6.6300;
+
+    // Sécurité : On vérifie si l'élément existe bien dans le DOM avant d'init
+    const mapEl = document.getElementById('map-publish');
+    if (!mapEl) return;
 
     this.map = L.map('map-publish', {
       zoomControl: false
@@ -104,7 +117,6 @@ export class PublishPage implements OnDestroy {
       }
     });
   }
-
   // Capte la position GPS actuelle du smartphone
   async getCurrentLocation() {
     if (!navigator.geolocation) {
@@ -211,19 +223,18 @@ export class PublishPage implements OnDestroy {
     });
     await loading.present();
 
-    const photoUrls = [this.spotForm.value.imageUrl];
+    // CORRECTION ICI : On récupère ton vrai tableau d'images (imagesUrl) au lieu d'un champ inexistant
+    const photoUrls = this.spotForm.get('imagesUrl')?.value || [];
     const serviceIds = this.spotForm.get('services')?.value || [];
 
-    // Récupère l'étiquette (Label) propre pour faire un titre automatique si l'utilisateur n'en met pas
     const selectedLodging = this.allLodging.find(l => l.id === this.spotForm.value.type);
     const typeLabel = selectedLodging ? selectedLodging.label : 'Spot Nature';
     const finalTitle = this.spotForm.value.title?.trim() || `${typeLabel} inédit`;
 
-    // Prépare l'objet propre pour l'API Supabase
     const spotData: Partial<any> = {
       title: finalTitle,
       description: this.spotForm.value.description,
-      type: this.spotForm.value.type, // Enverra par exemple 'alpine_hut', match parfait avec ton enum et la BDD SQL !
+      type: this.spotForm.value.type,
       latitude: this.spotForm.value.latitude,
       longitude: this.spotForm.value.longitude,
       rating: this.spotForm.value.rating,
@@ -232,13 +243,13 @@ export class PublishPage implements OnDestroy {
     };
 
     try {
-      // Envoi des données cleans à Supabase
       await this.spotsService.addSpot(spotData, photoUrls, serviceIds);
 
       loading.dismiss();
       await this.showToast('Le spot est partagé avec la commu, parfait !', 'success');
 
-      // Reset total
+      // Reset clean
+      this.imagesUrl = []; // On vide aussi la variable locale !
       this.spotForm.reset({
         title: '',
         description: '',
@@ -251,7 +262,7 @@ export class PublishPage implements OnDestroy {
         price: null,
         isForbiddenZone: false,
         services: [],
-        imageUrl: 'https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=600',
+        imagesUrl: [],
         location: 'Spot inconnu',
         isFavorite: false
       });
@@ -272,5 +283,41 @@ export class PublishPage implements OnDestroy {
       position: 'bottom'
     });
     await toast.present();
+  }
+  async takePhoto() {
+    try {
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: 'uri' as any,
+        source: undefined
+      });
+
+      if (image.webPath) {
+        // 1. On ajoute la nouvelle photo dans ton tableau de classe pour l'affichage HTML
+        this.imagesUrl.push(image.webPath);
+
+        // 2. On met à jour le formulaire avec le tableau complet des images
+        this.spotForm.patchValue({
+          imagesUrl: [...this.imagesUrl]
+        });
+      }
+    } catch (error) {
+      console.log("L'utilisateur a annulé la capture :", error);
+    }
+  }
+  removePhoto(imgUrl: String, event: Event) {
+    event.stopPropagation(); // Évite de déclencher le clic du parent
+
+    // On filtre le tableau pour enlever l'image
+    this.imagesUrl = this.imagesUrl.filter(url => url !== imgUrl);
+
+    // On met à jour le formulaire
+    this.spotForm.patchValue({
+      imagesUrl: [...this.imagesUrl]
+    });
+  }
+  goBack(){
+    this.navCtrl.back();
   }
 }

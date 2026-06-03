@@ -83,7 +83,7 @@ export class SupabaseService {
       .eq('user_id', userId);
 
     if (error) throw error;
-    return (data || []).map(f => f.spot_id);
+    return (data || []).map((f: any) => f.spot_id);
   }
 
   // Ajoute ou retire un favori

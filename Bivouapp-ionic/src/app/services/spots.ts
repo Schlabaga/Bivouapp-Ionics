@@ -19,15 +19,14 @@ export class SpotsService {
     { id: 'pool',        label: 'Baignade',     icon: 'boat-outline' },
     { id: 'shower',      label: 'Douche',       icon: 'rainy-outline' },
     { id: 'parking',     label: 'Parking',      icon: 'car-outline' },
-    { id: 'toilet',      label: 'Toilettes',    icon: 'toilet-outline' },
+    { id: 'toilet',      label: 'Toilettes',    icon: 'woman-outline' },
   ];
 
   private lodging: Lodging[] = [
-    { id: 'alpine_hut', label: 'Refuge', icon: 'business-outline' },
+    { id: 'bivouac', label: 'Bivouac', icon: 'moon-outline' },
+    { id: 'alpine_hut', label: 'Refuge / Gîte', icon: 'bed-outline' },
     { id: 'wilderness_hut', label: 'Abri', icon: 'home-outline' },
-    { id: 'bivouac', label: 'Bivouac', icon: 'tent-outline' },
     { id: 'camp_site', label: 'Camping', icon: 'bonfire-outline' },
-    { id: 'gite_hostel', label: 'Gîte d\'étape', icon: 'bed-outline' },
     { id: 'chalet', label: 'Chalet', icon: 'leaf-outline' }
   ];
 

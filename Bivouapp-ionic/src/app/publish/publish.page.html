@@ -1,84 +1,211 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Partager un spot</ion-title>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content class="ion-padding">
+<ion-content class="publish-content">
   <form [formGroup]="spotForm" (ngSubmit)="onSubmit()">
-
-
-  <div class="map-container">
-    <div id="map-publish"></div>
-    <ion-button class="gps-btn" expand="block" shape="round" color="secondary" (click)="getCurrentLocation()">
-      <ion-icon slot="start" name="locate-outline"></ion-icon>
-      Me géolocaliser
+    <ion-button class="nav-btn back-btn" fill="clear" (click)="goBack()">
+      <ion-icon name="close-outline"></ion-icon>
     </ion-button>
-  </div>
+    <div class="page-header">
+      <h1 class="page-title">Partager un spot</h1>
+    </div>
 
-  <ion-list lines="none" class="form-list">
-    <ion-item class="custom-input">
-      <ion-label position="stacked">Nom du spot (Optionnel)</ion-label>
-      <ion-input formControlName="title" placeholder="Ex: Clairière aux étoiles"></ion-input>
-    </ion-item>
+    <div class="section-card">
+      <div class="section-label">
+        <div class="label-icon-wrap">
+          <ion-icon name="location-outline"></ion-icon>
+        </div>
+        <span>Localisation</span>
 
-    <ion-item class="custom-input">
-      <ion-label position="stacked">Description *</ion-label>
-      <ion-textarea formControlName="description" placeholder="Dis-nous en plus sur ce coin de paradis... (Obligatoire)" rows="3"></ion-textarea>
-    </ion-item>
-  </ion-list>
+      </div>
+      <div class="map-wrapper">
+        <div id="map-publish"></div>
+        <button type="button" class="gps-pill" (click)="getCurrentLocation()">
+          <ion-icon name="locate-outline"></ion-icon>
+          Me géolocaliser
+        </button>
+      </div>
+      <div class="input-box">
+        <ion-icon name="search-outline" class="input-icon"></ion-icon>
+        <ion-input
+          formControlName="search"
+          placeholder="Ex : Mont Blanc"
+          class="clean-input">
 
-  <div class="section-container">
-    <h3 class="section-title">Quel type d'hébergement ?</h3>
-    <div class="grid-selector">
-      <div *ngFor="let item of allLodging"
-           [class.selected]="isLodgingSelected(item.id)"
-           (click)="selectLodging(item.id)"
-           class="selector-chip">
-        <ion-icon [name]="item.icon"></ion-icon>
-        <span class="chip-label">{{ item.label }}</span>
+        </ion-input>
       </div>
     </div>
-  </div>
 
-  <ion-list lines="full" class="toggle-list">
-    <ion-item>
-      <ion-icon slot="start" name="train-outline" color="medium"></ion-icon>
-      <ion-label>Accessible en train</ion-label>
-      <ion-toggle formControlName="accessibleByTrain"></ion-toggle>
-    </ion-item>
+    <div class="section-card">
+      <div class="section-label">
+        <div class="label-icon-wrap">
+          <ion-icon name="create-outline"></ion-icon>
+        </div>
+        <span>Informations</span>
+      </div>
 
-    <ion-item>
-      <ion-icon slot="start" name="cash-outline" color="medium"></ion-icon>
-      <ion-label>Accès payant</ion-label>
-      <ion-toggle formControlName="isPaid" (ionChange)="onPaidToggleChange($event)"></ion-toggle>
-    </ion-item>
+      <div class="field-group">
+        <label class="field-label">
+          Nom du spot
+          <span class="badge-optional">Optionnel</span>
+        </label>
+        <div class="input-box">
+          <ion-icon name="bookmark-outline" class="input-icon"></ion-icon>
+          <ion-input
+            formControlName="title"
+            placeholder="Ex : Clairière aux étoiles"
+            class="clean-input">
+          </ion-input>
+        </div>
+      </div>
 
-    <ion-item *ngIf="spotForm.get('isPaid')?.value" class="price-input animate__animated animate__fadeIn">
-      <ion-label slot="start">Tarif (€)</ion-label>
-      <ion-input type="number" formControlName="price" placeholder="0.00"></ion-input>
-    </ion-item>
-  </ion-list>
+      <div class="field-group">
+        <label class="field-label">
+          Description
+          <span class="badge-required">Requis</span>
+        </label>
+        <div class="input-box textarea-box">
+          <ion-textarea
+            formControlName="description"
+            placeholder="Décris l'accès, l'ambiance, les conseils… plus c'est détaillé, mieux c'est !"
+            rows="4"
+            class="clean-input">
+          </ion-textarea>
+        </div>
+      </div>
 
-  <div class="section-container">
-    <h3 class="section-title">Services disponibles sur place</h3>
-    <div class="grid-selector">
-      <div *ngFor="let service of allServices"
-           [class.selected]="isServiceSelected(service.id)"
-           (click)="toggleService(service.id)"
-           class="selector-chip service-chip">
-        <ion-icon [name]="service.icon"></ion-icon>
-        <span class="chip-label">{{ service.label }}</span>
+    </div>
+    <div class="section-card">
+      <div class="section-label">
+        <div class="label-icon-wrap">
+          <ion-icon name="camera-outline"></ion-icon>
+        </div>
+        <span>Photos du spot</span>
+      </div>
+
+      @if (imagesUrl.length > 0) {
+        <div class="preview-gallery-grid">
+
+          @for (imgUrl of imagesUrl; track imgUrl) {
+            <div class="mini-preview-wrapper">
+              <img [src]="imgUrl" class="mini-preview-img" />
+              <button type="button" class="delete-img-btn" (click)="removePhoto(imgUrl, $event)">
+                <ion-icon name="close-circle"></ion-icon>
+              </button>
+            </div>
+          }
+
+          <div class="mini-upload-btn" (click)="takePhoto()">
+            <ion-icon name="add-outline"></ion-icon>
+            <span>Ajouter</span>
+          </div>
+
+        </div>
+      }
+      @else {
+        <div class="upload-placeholder" (click)="takePhoto()">
+          <div class="upload-circle">
+            <ion-icon name="image-outline"></ion-icon>
+          </div>
+          <p class="upload-text">Ajouter une photo du bivouac</p>
+          <p class="upload-sub">Appareil photo ou galerie</p>
+        </div>
+      }
+    </div>
+
+    <div class="section-card">
+      <div class="section-label">
+        <div class="label-icon-wrap">
+          <ion-icon name="home-outline"></ion-icon>
+        </div>
+        <span>Type d'hébergement</span>
+      </div>
+      <div class="chips-grid">
+        @for (item of allLodging; track item.id) {
+          <div [class.selected]="isLodgingSelected(item.id)"
+               (click)="selectLodging(item.id)"
+               class="type-chip">
+            <div class="chip-icon-wrap">
+              <ion-icon [name]="item.icon"></ion-icon>
+            </div>
+            <span class="chip-label">{{ item.label }}</span>
+          </div>
+        }
       </div>
     </div>
-  </div>
 
-  <div class="ion-margin-top">
-    <ion-button type="submit" expand="block" color="success" class="submit-btn">
-      <ion-icon slot="start" name="cloud-upload-outline"></ion-icon>
+    <div class="section-card">
+      <div class="section-label">
+        <div class="label-icon-wrap">
+          <ion-icon name="options-outline"></ion-icon>
+        </div>
+        <span>Options</span>
+      </div>
+
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <div class="toggle-icon-wrap">
+            <ion-icon name="train-outline"></ion-icon>
+          </div>
+          <div>
+            <p class="toggle-title">Accessible en train</p>
+            <p class="toggle-sub">Gare ou arrêt à proximité</p>
+          </div>
+        </div>
+        <ion-toggle formControlName="accessibleByTrain" class="custom-toggle"></ion-toggle>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <div class="toggle-info">
+            <div class="toggle-icon-wrap">
+              <ion-icon name="cash-outline"></ion-icon>
+            </div>
+            <div>
+              <p class="toggle-title">Accès payant</p>
+              <p class="toggle-sub">Droit d'entrée ou redevance</p>
+            </div>
+          </div>
+        </div>
+        <ion-toggle formControlName="isPaid" (ionChange)="onPaidToggleChange($event)" class="custom-toggle"></ion-toggle>
+      </div>
+
+      @if (spotForm.get('isPaid')?.value) {
+        <div class="price-reveal">
+          <label class="field-label">Tarif</label>
+          <div class="input-box price-box">
+            <ion-icon name="pricetag-outline" class="input-icon"></ion-icon>
+            <ion-input type="number" formControlName="price" placeholder="0.00" class="clean-input"></ion-input>
+            <span class="currency-tag">€</span>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="section-card">
+      <div class="section-label">
+        <div class="label-icon-wrap">
+          <ion-icon name="construct-outline"></ion-icon>
+        </div>
+        <span>Services disponibles</span>
+      </div>
+      <div class="chips-grid">
+        @for (service of allServices; track service.id) {
+          <div [class.selected]="isServiceSelected(service.id)"
+               (click)="toggleService(service.id)"
+               class="type-chip service-chip">
+            <div class="chip-icon-wrap">
+              <ion-icon [name]="service.icon"></ion-icon>
+            </div>
+            <span class="chip-label">{{ service.label }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <button type="submit" class="submit-btn">
+      <ion-icon name="cloud-upload-outline"></ion-icon>
       Publier le spot
-    </ion-button>
-  </div>
+    </button>
 
   </form>
 </ion-content>
