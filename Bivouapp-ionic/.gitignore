@@ -11,7 +11,8 @@ $RECYCLE.BIN/
 
 *.log
 log.txt
-
+src/app/environment/environment.ts
+../.idea/
 
 /.sourcemaps
 /.versions
@@ -68,3 +69,5 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+src/app/environment/environment.ts
+/src/environments/
