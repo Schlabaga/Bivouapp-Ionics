@@ -8,6 +8,9 @@ import { Lodging, Service } from '../models/spot.model';
 import * as L from 'leaflet';
 import { Camera } from '@capacitor/camera';
 import {NavController} from "@ionic/angular";
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { from } from 'rxjs';
+import {environment} from "../environment/environment";
 
 
 
@@ -26,6 +29,7 @@ export class PublishPage implements OnDestroy {
   marker: L.Marker | null = null;
   selectedImage: string | undefined;
   imagesUrl: String[] =[];
+  searchResults:any[] =[];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -44,21 +48,24 @@ export class PublishPage implements OnDestroy {
     this.allLodging = this.spotsService.getAllLodging();
 
     this.spotForm = this.formBuilder.group({
-      title: [''], // Optionnel, géré au submit si vide
-      description: ['', [Validators.required]], // Toujours requis !
-      type: ['bivouac', [Validators.required]], // On met par défaut l'ID 'bivouac' qui est dans ton tableau propre
+      search: [''],  // ← ajoute cette ligne
+      title: [''],
+      description: ['', [Validators.required]],
+      type: ['bivouac', [Validators.required]],
       longitude: [6.6300, [Validators.required]],
       latitude: [45.9366, [Validators.required]],
       rating: [4],
       accessibleByTrain: [false],
       isPaid: [false],
-      price: [null], // Validé dynamiquement si isPaid passe à true
+      price: [null],
       isForbiddenZone: [false],
       services: [[]],
       imagesUrl: [[]],
       location: ['Spot inconnu'],
       isFavorite: false
     });
+
+    this.initSearch();
   }
 
   ionViewDidEnter() {
@@ -245,25 +252,26 @@ export class PublishPage implements OnDestroy {
     try {
       await this.spotsService.addSpot(spotData, photoUrls, serviceIds);
 
-      loading.dismiss();
+      await loading.dismiss();
       await this.showToast('Le spot est partagé avec la commu, parfait !', 'success');
 
       // Reset clean
       this.imagesUrl = []; // On vide aussi la variable locale !
-      this.spotForm.reset({
-        title: '',
-        description: '',
-        type: 'bivouac',
-        latitude: 45.9366,
-        longitude: 6.6300,
-        rating: 4,
-        accessibleByTrain: false,
-        isPaid: false,
-        price: null,
-        isForbiddenZone: false,
-        services: [],
-        imagesUrl: [],
-        location: 'Spot inconnu',
+      this.spotForm = this.formBuilder.group({
+        search: [''],  //
+        title: [''],
+        description: ['', [Validators.required]],
+        type: ['bivouac', [Validators.required]],
+        longitude: [6.6300, [Validators.required]],
+        latitude: [45.9366, [Validators.required]],
+        rating: [4],
+        accessibleByTrain: [false],
+        isPaid: [false],
+        price: [null],
+        isForbiddenZone: [false],
+        services: [[]],
+        imagesUrl: [[]],
+        location: ['Spot inconnu'],
         isFavorite: false
       });
 
@@ -319,5 +327,37 @@ export class PublishPage implements OnDestroy {
   }
   goBack(){
     this.navCtrl.back();
+  }
+
+  initSearch() {
+    this.spotForm.get('search')?.valueChanges.pipe(
+      debounceTime(400),           // attend 400ms que l'user arrête de taper
+      distinctUntilChanged(),      // ignore si la valeur n'a pas changé
+      switchMap(query => {         // annule la requête précédente si nouvelle frappe
+        if (!query || query.length < 3) return from(Promise.resolve([]));
+        return from(
+          fetch(`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${query}&key=${environment.googlePlaceApiKey}&language=fr`)
+            .then(res => res.json())
+        );
+      })
+    ).subscribe(results => {
+      this.searchResults = results; // liste de suggestions à afficher
+    });
+  }
+
+  selectResult(result:any){
+    const lat= parseFloat(result.lat);
+    const lng = parseFloat(result.lon);
+
+    this.updateCoordinates(lat,lng);
+
+    if(this.map && this.marker){
+      this.marker.setLatLng([lat,lng])
+
+      this.map.setView([lat,lng])
+    }
+
+    this.searchResults=[];
+    this.spotForm.get('search')?.setValue('')
   }
 }

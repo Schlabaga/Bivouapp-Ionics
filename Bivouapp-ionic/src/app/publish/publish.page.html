@@ -28,9 +28,19 @@
           formControlName="search"
           placeholder="Ex : Mont Blanc"
           class="clean-input">
-
         </ion-input>
       </div>
+      @if (searchResults.length>0){
+        <div class="search-result">
+          @for (searchResult of searchResults ; track searchResult){
+            <div class="search-result-item" (click)="selectResult(searchResult)">
+              <span class="result-name">{{ searchResult.display_name.split(',')[0] }}</span>
+              <span class="result-location">{{ searchResult.display_name.split(',')[1] }}, {{ searchResult.display_name.split(',')[2] }}</span>
+            </div>
+          }
+
+        </div>
+      }
     </div>
 
     <div class="section-card">

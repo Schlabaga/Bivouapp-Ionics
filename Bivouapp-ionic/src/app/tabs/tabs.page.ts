@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router, NavigationEnd } from '@angular/router';
 
 @Component({
   selector: 'app-tabs',
@@ -7,18 +8,16 @@ import { Component } from '@angular/core';
   standalone: false,
 })
 export class TabsPage {
-  showTabBar=true;
+  showTabBar = true;
 
-  constructor() {}
-
-  ionTabsWillChange(event:any){
-    if(event.tab){
-      if(event.tab == 'map' || event.tab=='publish'){
-        this.showTabBar= false;
-      } else{
-        this.showTabBar= true;
+  constructor(private router: Router) {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        const url = event.urlAfterRedirects;
+        setTimeout(() => {
+          this.showTabBar = !url.includes('/tabs/map') && !url.includes('/tabs/publish');
+        }, 50);
       }
-    }
-
+    });
   }
 }

@@ -1,23 +1,21 @@
-<ion-tabs (ionTabsWillChange)="ionTabsWillChange($event)">
-  @if (showTabBar) {
-    <ion-tab-bar slot="bottom">
+<ion-tabs>
+  <ion-tab-bar slot="bottom" [class.hide-tab-bar]="!showTabBar">
 
-      <ion-tab-button tab="explore">
-        <ion-icon name="home"></ion-icon>
-      </ion-tab-button>
+    <ion-tab-button tab="explore">
+      <ion-icon name="home"></ion-icon>
+    </ion-tab-button>
 
-      <ion-tab-button tab="map">
-        <ion-icon name="map"></ion-icon>
-      </ion-tab-button>
+    <ion-tab-button tab="map">
+      <ion-icon name="map"></ion-icon>
+    </ion-tab-button>
 
-      <ion-tab-button tab="publish">
-        <ion-icon name="add-circle"></ion-icon>
-      </ion-tab-button>
+    <ion-tab-button tab="publish">
+      <ion-icon name="add-circle"></ion-icon>
+    </ion-tab-button>
 
-      <ion-tab-button tab="settings">
-        <ion-icon name="person"></ion-icon>
-      </ion-tab-button>
+    <ion-tab-button tab="settings">
+      <ion-icon name="person"></ion-icon>
+    </ion-tab-button>
 
-    </ion-tab-bar>
-  }
+  </ion-tab-bar>
 </ion-tabs>

@@ -466,3 +466,35 @@
     color: #9CA3AF;
   }
 }
+
+
+.search-result {
+  background: #fff;
+  border-radius: 12px;
+  margin-top: 8px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  overflow: hidden;
+}
+
+.search-result-item {
+  padding: 12px 14px;
+  border-bottom: 1px solid #F6F8FC;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  &:last-child { border-bottom: none; }
+  &:active { background: #F6F8FC; }
+
+  .result-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+
+  .result-location {
+    font-size: 12px;
+    color: #9CA3AF;
+  }
+}

@@ -30,3 +30,8 @@ ion-tab-button {
     transform: scale(1.2); /* on grossit l'icône de 20% */
   }
 }
+
+.hide-tab-bar {
+  display: none !important;
+  transition: color 0.5s ease;
+}
