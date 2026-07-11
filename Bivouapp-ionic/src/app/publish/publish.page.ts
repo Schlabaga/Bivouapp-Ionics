@@ -10,7 +10,7 @@ import { Camera } from '@capacitor/camera';
 import {NavController} from "@ionic/angular";
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { from } from 'rxjs';
-import {environment} from "../environment/environment";
+import {environment} from "../../environment/environment";
 
 
 
