@@ -4,7 +4,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastController, LoadingController } from '@ionic/angular';
 import { SpotsService } from '../services/spots';
-import { Lodging, Service } from '../models/spot.model';
+import {
+  Lodging, Service,
+  WaterAvailabilityOption, LegalStatusOption, GroundTypeOption, NetworkCoverageOption
+} from '../models/spot.model';
 import * as L from 'leaflet';
 import { Camera } from '@capacitor/camera';
 import {NavController} from "@ionic/angular";
@@ -25,6 +28,10 @@ export class PublishPage implements OnDestroy {
   spotForm!: FormGroup;
   allServices: Service[] = [];
   allLodging: Lodging[] = [];
+  allWaterOptions: WaterAvailabilityOption[] = [];
+  allLegalOptions: LegalStatusOption[] = [];
+  allGroundOptions: GroundTypeOption[] = [];
+  allNetworkOptions: NetworkCoverageOption[] = [];
   map: L.Map | null = null;
   marker: L.Marker | null = null;
   selectedImage: string | undefined;
@@ -46,6 +53,10 @@ export class PublishPage implements OnDestroy {
   initForm() {
     this.allServices = this.spotsService.getAllServices();
     this.allLodging = this.spotsService.getAllLodging();
+    this.allWaterOptions = this.spotsService.getWaterOptions();
+    this.allLegalOptions = this.spotsService.getLegalOptions();
+    this.allGroundOptions = this.spotsService.getGroundOptions();
+    this.allNetworkOptions = this.spotsService.getNetworkOptions();
 
     this.spotForm = this.formBuilder.group({
       search: [''],  // ← ajoute cette ligne
@@ -59,6 +70,11 @@ export class PublishPage implements OnDestroy {
       isPaid: [false],
       price: [null],
       isForbiddenZone: [false],
+      // Critères de survie / légalité : par défaut "non renseigné", jamais présumés
+      water_availability: ['unknown'],
+      legal_status: ['unknown'],
+      ground_type: ['unknown'],
+      network_coverage: ['unknown'],
       services: [[]],
       imagesUrl: [[]],
       location: ['Spot inconnu'],
@@ -201,6 +217,16 @@ export class PublishPage implements OnDestroy {
     return this.spotForm.get('type')?.value === lodgingId;
   }
 
+  // === GESTION DES CRITÈRES DE SURVIE (Sélection unique par champ) ===
+  // Générique : sert pour water_availability, legal_status, ground_type, network_coverage
+  selectFieldValue(fieldName: string, value: string): void {
+    this.spotForm.get(fieldName)?.setValue(value);
+  }
+
+  isFieldValueSelected(fieldName: string, value: string): boolean {
+    return this.spotForm.get(fieldName)?.value === value;
+  }
+
   // === GESTION DES SERVICES (Sélection multiple) ===
   isServiceSelected(serviceId: string): boolean {
     const services = this.spotForm.get('services')?.value || [];
@@ -246,7 +272,11 @@ export class PublishPage implements OnDestroy {
       longitude: this.spotForm.value.longitude,
       rating: this.spotForm.value.rating,
       location: this.spotForm.value.location,
-      price: this.spotForm.value.isPaid ? this.spotForm.value.price : 0
+      price: this.spotForm.value.isPaid ? this.spotForm.value.price : 0,
+      water_availability: this.spotForm.value.water_availability,
+      legal_status: this.spotForm.value.legal_status,
+      ground_type: this.spotForm.value.ground_type,
+      network_coverage: this.spotForm.value.network_coverage
     };
 
     try {
@@ -269,6 +299,10 @@ export class PublishPage implements OnDestroy {
         isPaid: [false],
         price: [null],
         isForbiddenZone: [false],
+        water_availability: ['unknown'],
+        legal_status: ['unknown'],
+        ground_type: ['unknown'],
+        network_coverage: ['unknown'],
         services: [[]],
         imagesUrl: [[]],
         location: ['Spot inconnu'],

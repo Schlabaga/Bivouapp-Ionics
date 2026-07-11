@@ -20,6 +20,17 @@
       }
     </div>
 
+    <div class="quick-filters-scroll">
+      @for (filter of quickFilters; track filter.id) {
+        <div class="quick-filter-chip"
+             [class.active]="isQuickFilterActive(filter.id)"
+             (click)="toggleQuickFilter(filter.id)">
+          <ion-icon [name]="filter.icon"></ion-icon>
+          <span>{{ filter.label }}</span>
+        </div>
+      }
+    </div>
+
     @if (selectedCategory === 'feed') {
 
       <div class="section">

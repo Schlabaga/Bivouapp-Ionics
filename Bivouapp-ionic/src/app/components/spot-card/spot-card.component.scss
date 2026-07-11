@@ -42,6 +42,31 @@
     border-radius: 12px;
     font: bold 11px sans-serif;
   }
+
+  // petits badges eau potable / présence signalée, en bas à gauche
+  .info-badges {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    display: flex;
+    gap: 6px;
+  }
+
+  .mini-badge {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    background: rgba(255,255,255,0.9);
+    color: #2f65e8;
+    padding: 4px 7px;
+    border-radius: 10px;
+    font: bold 10px sans-serif;
+
+    ion-icon { font-size: 12px; }
+
+    &.water { color: #2f65e8; }
+    &.presence { color: #374b43; }
+  }
 }
 
 // la partie avec le texte

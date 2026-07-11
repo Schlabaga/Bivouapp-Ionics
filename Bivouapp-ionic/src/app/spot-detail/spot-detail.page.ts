@@ -1,8 +1,11 @@
 import {Component, OnInit, OnDestroy, Input, Output, EventEmitter} from '@angular/core';
 import { ActivatedRoute,  } from '@angular/router';
-import { Spot, Service } from '../models/spot.model';
+import {
+  Spot, Service,
+  WaterAvailabilityOption, LegalStatusOption, GroundTypeOption, NetworkCoverageOption
+} from '../models/spot.model';
 import { SpotsService } from '../services/spots';
-import {NavController} from "@ionic/angular";
+import {NavController, AlertController, ToastController} from "@ionic/angular";
 import * as L from 'leaflet';
 
 
@@ -26,15 +29,26 @@ export class SpotDetailPage implements OnInit, OnDestroy {
   currentImageIndex = 0;
   from="";
 
+  waterOptions: WaterAvailabilityOption[] = [];
+  legalOptions: LegalStatusOption[] = [];
+  groundOptions: GroundTypeOption[] = [];
+  networkOptions: NetworkCoverageOption[] = [];
+
   constructor(
     private route: ActivatedRoute,
     private spotsService: SpotsService,
-    private navCtrl: NavController
+    private navCtrl: NavController,
+    private alertController: AlertController,
+    private toastController: ToastController
   ) {}
 
   ngOnInit() {
     // 1. On charge d'abord la liste des services (communs aux deux cas)
     this.allServices = this.spotsService.getAllServices();
+    this.waterOptions = this.spotsService.getWaterOptions();
+    this.legalOptions = this.spotsService.getLegalOptions();
+    this.groundOptions = this.spotsService.getGroundOptions();
+    this.networkOptions = this.spotsService.getNetworkOptions();
 
     // 2. On regarde si on a reçu l'ID par l'Input (Cas du volet sur la carte)
     if (this.spotId) {
@@ -153,5 +167,110 @@ export class SpotDetailPage implements OnInit, OnDestroy {
   onCarouselScroll(event: any) {
     const container = event.target;
     this.currentImageIndex = Math.round(container.scrollLeft / container.clientWidth);
+  }
+
+  // --- Critères de survie : helpers d'affichage ---
+
+  get waterInfo(): WaterAvailabilityOption | undefined {
+    return this.waterOptions.find(o => o.id === (this.spot?.water_availability || 'unknown'));
+  }
+
+  get legalInfo(): LegalStatusOption | undefined {
+    return this.legalOptions.find(o => o.id === (this.spot?.legal_status || 'unknown'));
+  }
+
+  get groundInfo(): GroundTypeOption | undefined {
+    return this.groundOptions.find(o => o.id === (this.spot?.ground_type || 'unknown'));
+  }
+
+  get networkInfo(): NetworkCoverageOption | undefined {
+    return this.networkOptions.find(o => o.id === (this.spot?.network_coverage || 'unknown'));
+  }
+
+  // --- Disponibilité collaborative ---
+  // Texte relatif type "il y a 2h", pour ne pas laisser croire à un statut temps réel exact
+  get presenceLabel(): string {
+    const report = this.spot?.last_presence_report;
+    if (!report) return 'Aucun signalement récent';
+
+    const minutes = Math.round((Date.now() - new Date(report.reported_at).getTime()) / 60000);
+    let when: string;
+    if (minutes < 60) when = `il y a ${minutes} min`;
+    else if (minutes < 24 * 60) when = `il y a ${Math.round(minutes / 60)} h`;
+    else when = `il y a ${Math.round(minutes / (60 * 24))} j`;
+
+    const tentLabel = report.tent_count > 1 ? `${report.tent_count} tentes` : `${report.tent_count} tente`;
+    return `${tentLabel} signalées ${when}`;
+  }
+
+  async openPresenceReport() {
+    if (!this.spot) return;
+
+    const alert = await this.alertController.create({
+      header: 'Je suis sur place',
+      subHeader: 'Aide les prochains randonneurs à savoir à quoi s\'attendre',
+      inputs: [
+        {
+          name: 'tentCount',
+          type: 'number',
+          placeholder: 'Nombre de tentes sur le spot',
+          min: 0,
+          max: 99
+        }
+      ],
+      buttons: [
+        { text: 'Annuler', role: 'cancel' },
+        {
+          text: 'Signaler',
+          handler: async (data) => {
+            const count = parseInt(data.tentCount, 10);
+            if (isNaN(count) || count < 0) return false;
+            await this.spotsService.reportPresence(this.spot!.id, count);
+            this.loadSpot(this.spot!.id);
+            await this.showToast('Merci mon frate, signalement pris en compte !', 'success');
+            return true;
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  // --- Charte de préservation ---
+  async openEcoReport() {
+    if (!this.spot) return;
+
+    const alert = await this.alertController.create({
+      header: 'État du spot',
+      subHeader: 'Aide à préserver ce coin de nature',
+      buttons: [
+        {
+          text: '✅ Spot propre',
+          handler: async () => {
+            await this.spotsService.reportEcoStatus(this.spot!.id, 'clean');
+            await this.showToast('Merci pour ta vigilance, badge Gardien de la Nature +1 !', 'success');
+          }
+        },
+        {
+          text: '⚠️ Déchets trouvés',
+          handler: async () => {
+            await this.spotsService.reportEcoStatus(this.spot!.id, 'litter_reported');
+            await this.showToast('Signalé, merci de nous prévenir.', 'warning');
+          }
+        },
+        { text: 'Annuler', role: 'cancel' }
+      ]
+    });
+    await alert.present();
+  }
+
+  private async showToast(message: string, color: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2200,
+      color,
+      position: 'bottom'
+    });
+    await toast.present();
   }
 }

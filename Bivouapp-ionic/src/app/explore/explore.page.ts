@@ -29,6 +29,15 @@ export class ExplorePage implements OnInit, ViewWillEnter {
     { id: "point d'eau", label: "Point d'eau" }
   ];
 
+  // Filtres "survie", pas "confort" : combinables entre eux et avec la catégorie
+  quickFilters = [
+    { id: 'water_potable', label: 'Eau potable', icon: 'water' },
+    { id: 'legal_ok', label: 'Zone autorisée', icon: 'checkmark-circle-outline' },
+    { id: 'network', label: 'Réseau mobile', icon: 'cellular-outline' },
+    { id: 'eco_clean', label: 'Spot propre', icon: 'leaf-outline' },
+  ];
+  activeFilters = new Set<string>();
+
   constructor(
     private router: Router,
     private supabaseService: SupabaseService,
@@ -54,8 +63,8 @@ export class ExplorePage implements OnInit, ViewWillEnter {
       this.popularSpots = this.allSpots.filter(s => s.rating >= 4); // Exemple : spots bien notés
       this.recommendedSpots = this.allSpots.slice(0, 5); // Exemple : les 5 derniers
 
-      // On applique le filtre de catégorie actuel
-      this.selectCategory(this.selectedCategory);
+      // On applique le filtre de catégorie + les filtres essentiels actifs
+      this.applyFilters();
 
       console.log('Spots chargés depuis Supabase :', this.allSpots);
     } catch (err) {
@@ -65,21 +74,52 @@ export class ExplorePage implements OnInit, ViewWillEnter {
 
   selectCategory(catId: string) {
     this.selectedCategory = catId;
+    this.applyFilters();
+  }
 
-    if (catId === 'feed') {
-      // Dans le feed, on peut imaginer un mélange ou les spots recommandés
-      this.filteredSpots = [...this.recommendedSpots];
-      return;
+  toggleQuickFilter(filterId: string) {
+    if (this.activeFilters.has(filterId)) {
+      this.activeFilters.delete(filterId);
+    } else {
+      this.activeFilters.add(filterId);
     }
+    this.applyFilters();
+  }
 
-    if (catId === 'tout') {
-      this.filteredSpots = [...this.allSpots];
+  isQuickFilterActive(filterId: string): boolean {
+    return this.activeFilters.has(filterId);
+  }
+
+  private applyFilters() {
+    let base: Spot[];
+
+    if (this.selectedCategory === 'feed') {
+      base = [...this.recommendedSpots];
+    } else if (this.selectedCategory === 'tout') {
+      base = [...this.allSpots];
     } else {
       // Filtrage par type (attention à la casse dans ta DB !)
-      this.filteredSpots = this.allSpots.filter(
-        s => s.type?.toLowerCase() === catId.toLowerCase()
+      base = this.allSpots.filter(
+        s => s.type?.toLowerCase() === this.selectedCategory.toLowerCase()
       );
     }
+
+    this.filteredSpots = base.filter(spot => {
+      if (this.activeFilters.has('water_potable') && spot.water_availability !== 'potable') {
+        return false;
+      }
+      if (this.activeFilters.has('legal_ok') &&
+        spot.legal_status !== 'free' && spot.legal_status !== 'national_park_19_7') {
+        return false;
+      }
+      if (this.activeFilters.has('network') && spot.network_coverage !== 'good') {
+        return false;
+      }
+      if (this.activeFilters.has('eco_clean') && spot.eco_status === 'litter_reported') {
+        return false;
+      }
+      return true;
+    });
   }
 
   openSpotDetail(spotId: number) {

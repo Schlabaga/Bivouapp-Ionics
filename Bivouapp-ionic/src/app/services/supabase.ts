@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../../environment/environment';
-import { Spot } from '../models/spot.model';
-
+import { Spot, PresenceReport, EcoStatus } from '../models/spot.model';
 @Injectable({ providedIn: 'root' })
 export class SupabaseService {
   private supabase: SupabaseClient;
@@ -11,14 +10,15 @@ export class SupabaseService {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
   }
 
-  // Récupère tous les spots avec leurs photos et services
+  // Récupère tous les spots avec leurs photos, services et dernier signalement de présence
   async getSpots(): Promise<Spot[]> {
     const { data, error } = await this.supabase
       .from('spots')
       .select(`
         *,
         spot_photos ( id, url, is_cover ),
-        spot_services ( service_id )
+        spot_services ( service_id ),
+        presence_reports ( id, tent_count, reported_at, reported_by )
       `)
       .order('created_at', { ascending: false });
 
@@ -33,7 +33,8 @@ export class SupabaseService {
       .select(`
         *,
         spot_photos ( id, url, is_cover ),
-        spot_services ( service_id )
+        spot_services ( service_id ),
+        presence_reports ( id, tent_count, reported_at, reported_by )
       `)
       .eq('id', id)
       .single();
@@ -44,7 +45,7 @@ export class SupabaseService {
 
   // Ajoute un spot + ses photos et services
   async addSpot(newSpot: Partial<Spot>, photoUrls: string[], serviceIds: string[]): Promise<Spot> {
-    const { spot_photos, spot_services, isFavorite, coverUrl, ...spotData } = newSpot as any;
+    const { spot_photos, spot_services, isFavorite, coverUrl, last_presence_report, eco_status, ...spotData } = newSpot as any;
 
     const { data, error } = await this.supabase
       .from('spots')
@@ -96,13 +97,46 @@ export class SupabaseService {
     }
   }
 
-  // Ajoute coverUrl sur chaque spot pour simplifier les templates
+  // --- Disponibilité collaborative ---
+  // Pas de réservation : on horodate juste "il y a X tentes ici".
+  // Cette table sert de flux, pas d'état ; on prend le plus récent par spot.
+  async reportPresence(spotId: number, tentCount: number, userId?: string): Promise<PresenceReport> {
+    const { data, error } = await this.supabase
+      .from('presence_reports')
+      .insert({ spot_id: spotId, tent_count: tentCount, reported_by: userId ?? null })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data as PresenceReport;
+  }
+
+  // --- Signalement écologique communautaire ---
+  async reportEcoStatus(spotId: number, status: EcoStatus, userId?: string, comment?: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('eco_reports')
+      .insert({ spot_id: spotId, status, reported_by: userId ?? null, comment: comment ?? null });
+
+    if (error) throw error;
+  }
+
+  // Ajoute coverUrl + dernier signalement de présence sur chaque spot pour simplifier les templates
   private mapSpot(raw: any): Spot {
     const cover = (raw.spot_photos || []).find((p: any) => p.is_cover) || raw.spot_photos?.[0];
+
+    // presence_reports arrive en vrac depuis Supabase : on garde uniquement le plus récent
+    const reports: any[] = raw.presence_reports || [];
+    const lastReport = reports.length
+      ? reports.reduce((latest, r) =>
+          new Date(r.reported_at) > new Date(latest.reported_at) ? r : latest
+        )
+      : undefined;
+
     return {
       ...raw,
       coverUrl: cover?.url || 'https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=600',
-      isFavorite: false // sera mis à jour par le service avec la table favorites
+      isFavorite: false, // sera mis à jour par le service avec la table favorites
+      last_presence_report: lastReport
     };
   }
 }

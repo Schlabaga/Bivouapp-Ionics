@@ -40,6 +40,39 @@ ion-content { --background: #fff; }
   }
 }
 
+// filtres "survie" (eau potable, zone autorisée, réseau, spot propre)
+.quick-filters-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  margin-bottom: 20px;
+  &::-webkit-scrollbar { display: none; }
+
+  .quick-filter-chip {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    padding: 8px 14px;
+    border-radius: 20px;
+    background: #F6F8FC;
+    color: #666;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+
+    ion-icon { font-size: 15px; }
+
+    &.active {
+      background: #EEF3FF;
+      color: #2f65e8;
+      border-color: #2f65e8;
+    }
+  }
+}
+
 // titre des sections
 .section-header {
   padding-top: 10px;

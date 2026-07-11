@@ -194,6 +194,80 @@
     <div class="section-card">
       <div class="section-label">
         <div class="label-icon-wrap">
+          <ion-icon name="shield-checkmark-outline"></ion-icon>
+        </div>
+        <span>Critères essentiels</span>
+      </div>
+      <p class="section-hint">Ce qui compte vraiment en pleine nature : survie et légalité.</p>
+
+      <div class="field-group">
+        <label class="field-label">Point d'eau</label>
+        <div class="chips-grid">
+          @for (item of allWaterOptions; track item.id) {
+            <div [class.selected]="isFieldValueSelected('water_availability', item.id)"
+                 (click)="selectFieldValue('water_availability', item.id)"
+                 class="type-chip">
+              <div class="chip-icon-wrap">
+                <ion-icon [name]="item.icon"></ion-icon>
+              </div>
+              <span class="chip-label">{{ item.label }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Réglementation</label>
+        <div class="chips-grid">
+          @for (item of allLegalOptions; track item.id) {
+            <div [class.selected]="isFieldValueSelected('legal_status', item.id)"
+                 (click)="selectFieldValue('legal_status', item.id)"
+                 class="type-chip">
+              <div class="chip-icon-wrap">
+                <ion-icon [name]="item.icon"></ion-icon>
+              </div>
+              <span class="chip-label">{{ item.label }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Nature du sol</label>
+        <div class="chips-grid">
+          @for (item of allGroundOptions; track item.id) {
+            <div [class.selected]="isFieldValueSelected('ground_type', item.id)"
+                 (click)="selectFieldValue('ground_type', item.id)"
+                 class="type-chip">
+              <div class="chip-icon-wrap">
+                <ion-icon [name]="item.icon"></ion-icon>
+              </div>
+              <span class="chip-label">{{ item.label }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Réseau mobile</label>
+        <div class="chips-grid">
+          @for (item of allNetworkOptions; track item.id) {
+            <div [class.selected]="isFieldValueSelected('network_coverage', item.id)"
+                 (click)="selectFieldValue('network_coverage', item.id)"
+                 class="type-chip">
+              <div class="chip-icon-wrap">
+                <ion-icon [name]="item.icon"></ion-icon>
+              </div>
+              <span class="chip-label">{{ item.label }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-label">
+        <div class="label-icon-wrap">
           <ion-icon name="construct-outline"></ion-icon>
         </div>
         <span>Services disponibles</span>

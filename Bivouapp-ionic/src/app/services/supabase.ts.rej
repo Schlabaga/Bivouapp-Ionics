@@ -1,0 +1,10 @@
+diff a/Bivouapp-ionic/src/app/services/supabase.ts b/Bivouapp-ionic/src/app/services/supabase.ts	(rejected hunks)
+@@ -1,7 +1,7 @@
+ import { Injectable } from '@angular/core';
+ import { createClient, SupabaseClient } from '@supabase/supabase-js';
+ import { environment } from '../environment/environment';
+-import { Spot } from '../models/spot.model';
++import { Spot, PresenceReport, EcoStatus } from '../models/spot.model';
+ 
+ @Injectable({ providedIn: 'root' })
+ export class SupabaseService {

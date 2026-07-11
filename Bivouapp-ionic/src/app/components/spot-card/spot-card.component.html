@@ -12,6 +12,22 @@
     <div class="distance-badge">
       {{ spot.distance }} km
     </div>
+
+    @if (spot.water_availability === 'potable' || spot.last_presence_report) {
+      <div class="info-badges">
+        @if (spot.water_availability === 'potable') {
+          <div class="mini-badge water">
+            <ion-icon name="water"></ion-icon>
+          </div>
+        }
+        @if (spot.last_presence_report) {
+          <div class="mini-badge presence">
+            <ion-icon name="people-outline"></ion-icon>
+            <span>{{ spot.last_presence_report.tent_count }}</span>
+          </div>
+        }
+      </div>
+    }
   </div>
 
   <div class="info-content">

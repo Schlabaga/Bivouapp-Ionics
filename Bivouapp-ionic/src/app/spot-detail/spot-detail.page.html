@@ -58,6 +58,65 @@
         </p>
       </div>
 
+      <div class="essentials-section">
+        <h3>Avant d'y aller</h3>
+        <div class="essentials-grid">
+          <div class="essential-card">
+            <ion-icon name="water-outline"></ion-icon>
+            <span class="essential-label">Eau</span>
+            <span class="essential-value">{{ waterInfo?.label }}</span>
+          </div>
+          <div class="essential-card" [class]="'legal-' + legalInfo?.color">
+            <ion-icon [name]="legalInfo?.icon"></ion-icon>
+            <span class="essential-label">Réglementation</span>
+            <span class="essential-value">{{ legalInfo?.label }}</span>
+          </div>
+          <div class="essential-card">
+            <ion-icon name="layers-outline"></ion-icon>
+            <span class="essential-label">Sol</span>
+            <span class="essential-value">{{ groundInfo?.label }}</span>
+          </div>
+          <div class="essential-card">
+            <ion-icon name="cellular-outline"></ion-icon>
+            <span class="essential-label">Réseau mobile</span>
+            <span class="essential-value">{{ networkInfo?.label }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="presence-section">
+        <div class="presence-card">
+          <div class="presence-text">
+            <ion-icon name="people-outline"></ion-icon>
+            <div>
+              <span class="presence-title">Disponibilité collaborative</span>
+              <span class="presence-status">{{ presenceLabel }}</span>
+            </div>
+          </div>
+          <ion-button fill="outline" size="small" class="presence-btn" (click)="openPresenceReport()">
+            Je suis sur place
+          </ion-button>
+        </div>
+
+        <div class="eco-row">
+          <div class="eco-badge" [class.warning]="spot.eco_status === 'litter_reported'">
+            <ion-icon [name]="spot.eco_status === 'litter_reported' ? 'alert-circle-outline' : 'leaf-outline'"></ion-icon>
+            <span>
+              @if (spot.eco_status === 'litter_reported') {
+                Déchets signalés récemment
+              } @else if (spot.eco_status === 'clean') {
+                Spot propre
+              } @else {
+                État écologique non renseigné
+              }
+            </span>
+          </div>
+          <ion-button fill="clear" size="small" class="eco-report-btn" (click)="openEcoReport()">
+            Signaler l'état
+          </ion-button>
+        </div>
+      </div>
+
       <div class="services-section">
         <h3>Services</h3>
         <div class="services-grid">
