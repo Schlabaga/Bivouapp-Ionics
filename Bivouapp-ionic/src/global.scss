@@ -40,3 +40,41 @@
 
 @import "~leaflet/dist/leaflet.css";
 
+/**
+ * Bivouapp Design System — "Bushcraft Moderne"
+ * -----------------------------------------------------
+ * Palette chaude (orange/ambre, terre) inspirée du bushcraft, en rupture
+ * avec le bleu générique "app de voyage". Sert de base pour les futurs
+ * éléments de gamification (badges, XP, niveaux de "Gardien de la Nature").
+ *
+ * On garde des surfaces claires (lisibilité, pas de refonte dark-mode
+ * risquée d'un coup) mais on change l'accent et le traitement des cartes.
+ */
+:root {
+  // Accent principal — orange bushcraft (remplace le bleu #2f65e8)
+  --bv-primary: #E8722F;
+  --bv-primary-rgb: 232, 114, 47;
+  --bv-primary-dark: #C2591D;
+  --bv-primary-light: #FFB37A;
+  --bv-primary-tint: #FDEEE2; // fond très clair, remplace les #EEF3FF bleutés
+
+  // Surfaces sombres chaudes — pour overlays de cartes, futurs écrans dark
+  --bv-ink: #231912;
+  --bv-ink-soft: #3A2C20;
+  --bv-ink-rgb: 35, 25, 18;
+
+  // Neutres chauds — remplacent les gris froids #F6F8FC / #F8F9FE
+  --bv-cream: #FBF3E7;
+  --bv-sand: #F3E7D8;
+  --bv-stone: #9C8F80;
+
+  // Sémantique nature (au lieu du vert/orange "succès/warning" génériques Ionic)
+  --bv-moss: #6B8E4E;      // spot propre / eau potable / zone libre
+  --bv-amber-warn: #D98E2B; // réglementé / réseau instable
+  --bv-clay-danger: #C1502E; // interdit / déchets signalés
+
+  // Rayons et ombres cohérents pour toutes les cartes
+  --bv-radius-lg: 24px;
+  --bv-radius-md: 16px;
+  --bv-shadow-card: 0 8px 24px rgba(var(--bv-ink-rgb), 0.12);
+}

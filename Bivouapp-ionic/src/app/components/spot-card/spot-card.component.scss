@@ -1,9 +1,9 @@
-// le rectangle blanc tout propre
+// le rectangle blanc tout propre — "Bushcraft Moderne" : coins plus généreux, ombre plus douce et chaude
 .card-container {
   background: #fff;
-  border-radius: 20px;
+  border-radius: var(--bv-radius-lg);
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  box-shadow: var(--bv-shadow-card);
   margin-bottom: 10px;
   transition: 0.2s;
   &:active { transform: scale(0.98); } // effet quand on clique
@@ -12,15 +12,24 @@
 // la zone de l'image
 .image-wrapper {
   position: relative;
-  height: 140px;
+  height: 150px;
   img { width: 100%; height: 100%; object-fit: cover; }
+
+  // dégradé sombre chaud en bas de l'image, façon moodboard, pour faire ressortir les badges
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(var(--bv-ink-rgb), 0) 55%, rgba(var(--bv-ink-rgb), 0.55) 100%);
+    pointer-events: none;
+  }
 
   // le bouton pour le coeur
   .fav-btn {
     position: absolute;
     top: 10px;
     right: 10px;
-    background: rgba(255,255,255,0.2);
+    background: rgba(var(--bv-ink-rgb), 0.35);
     width: 32px;
     height: 32px;
     border-radius: 50%;
@@ -29,6 +38,7 @@
     justify-content: center;
     z-index: 10;
     cursor: pointer;
+    backdrop-filter: blur(4px);
   }
 
   // le badge de distance en bas à droite
@@ -36,7 +46,8 @@
     position: absolute;
     bottom: 10px;
     right: 10px;
-    background: #374b43;
+    z-index: 2;
+    background: var(--bv-primary);
     color: #fff;
     padding: 4px 10px;
     border-radius: 12px;
@@ -48,6 +59,7 @@
     position: absolute;
     bottom: 10px;
     left: 10px;
+    z-index: 2;
     display: flex;
     gap: 6px;
   }
@@ -56,16 +68,16 @@
     display: flex;
     align-items: center;
     gap: 3px;
-    background: rgba(255,255,255,0.9);
-    color: #2f65e8;
+    background: rgba(255,255,255,0.92);
+    color: var(--bv-primary-dark);
     padding: 4px 7px;
     border-radius: 10px;
     font: bold 10px sans-serif;
 
     ion-icon { font-size: 12px; }
 
-    &.water { color: #2f65e8; }
-    &.presence { color: #374b43; }
+    &.water { color: #2E7FB8; } // l'eau reste bleue, seul repère de couleur "froide" volontaire
+    &.presence { color: var(--bv-ink); }
   }
 }
 
@@ -77,7 +89,7 @@
   .title {
     margin: 0 0 4px;
     font: bold 15px sans-serif;
-    color: #1a1a1a;
+    color: var(--bv-ink);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -90,15 +102,17 @@
     gap: 4px;
     margin-bottom: 8px;
     font-size: 11px;
-    color: #666;
+    color: var(--bv-stone);
   }
 
-  .star-icon { color: #ffd700; font-size: 14px; }
+  .tag-row ion-icon { color: var(--bv-primary); }
+
+  .star-icon { color: var(--bv-primary-light); font-size: 14px; }
 
   // le prix en gras
   .price {
     font: 650 18px sans-serif;
-    color: #2f4f4f;
-    &.free { color: #00d68f; } // vert si c'est gratuit
+    color: var(--bv-ink);
+    &.free { color: var(--bv-moss); } // vert mousse si c'est gratuit
   }
 }

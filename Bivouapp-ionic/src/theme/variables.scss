@@ -1,2 +1,17 @@
 // For information on how to create your own theme, please refer to:
 // https://ionicframework.com/docs/theming/
+
+/*
+ * "Bushcraft Moderne" — on remplace le bleu par défaut d'Ionic (#3880ff)
+ * par l'orange bushcraft, pour que tous les composants natifs
+ * (ion-button color="primary", ion-toggle, ion-checkbox...) suivent
+ * automatiquement la nouvelle identité sans avoir à patcher chaque écran.
+ */
+:root {
+  --ion-color-primary: #E8722F;
+  --ion-color-primary-rgb: 232, 114, 47;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #C2591D;
+  --ion-color-primary-tint: #FFB37A;
+}
