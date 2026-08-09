@@ -1,295 +1,358 @@
-<ion-content class="publish-content">
-  <form [formGroup]="spotForm" (ngSubmit)="onSubmit()">
-    <ion-button class="nav-btn back-btn" fill="clear" (click)="goBack()">
-      <ion-icon name="close-outline"></ion-icon>
-    </ion-button>
-    <div class="page-header">
-      <h1 class="page-title">Partager un spot</h1>
-    </div>
+<ion-content class="publish-content" [scrollY]="false">
+  <form [formGroup]="spotForm" (ngSubmit)="onSubmit()" class="wizard-shell">
 
-    <div class="section-card">
-      <div class="section-label">
-        <div class="label-icon-wrap">
-          <ion-icon name="location-outline"></ion-icon>
-        </div>
-        <span>Localisation</span>
-
-      </div>
-      <div class="map-wrapper">
-        <div id="map-publish"></div>
-        <button type="button" class="gps-pill" (click)="getCurrentLocation()">
-          <ion-icon name="locate-outline"></ion-icon>
-          Me géolocaliser
+    <!-- ============ HEADER : progression + titre de l'étape ============ -->
+    <div class="wizard-header">
+      <div class="header-top-row">
+        <button type="button" class="nav-btn back-btn" (click)="prevStep()">
+          <ion-icon [name]="currentStep === 1 ? 'close-outline' : 'arrow-back-outline'"></ion-icon>
         </button>
-      </div>
-      <div class="input-box">
-        <ion-icon name="search-outline" class="input-icon"></ion-icon>
-        <ion-input
-          formControlName="search"
-          placeholder="Ex : Mont Blanc"
-          class="clean-input">
-        </ion-input>
-      </div>
-      @if (searchResults.length>0){
-        <div class="search-result">
-          @for (searchResult of searchResults ; track searchResult){
-            <div class="search-result-item" (click)="selectResult(searchResult)">
-              <span class="result-name">{{ searchResult.display_name.split(',')[0] }}</span>
-              <span class="result-location">{{ searchResult.display_name.split(',')[1] }}, {{ searchResult.display_name.split(',')[2] }}</span>
-            </div>
-          }
 
+        <div class="progress-track">
+          <div class="progress-fill" [style.width.%]="progressPercent"></div>
         </div>
-      }
-    </div>
 
-    <div class="section-card">
-      <div class="section-label">
-        <div class="label-icon-wrap">
-          <ion-icon name="create-outline"></ion-icon>
-        </div>
-        <span>Informations</span>
+        <span class="step-counter">{{ currentStep }}/{{ totalSteps }}</span>
       </div>
 
-      <div class="field-group">
-        <label class="field-label">
-          Nom du spot
-          <span class="badge-optional">Optionnel</span>
-        </label>
-        <div class="input-box">
-          <ion-icon name="bookmark-outline" class="input-icon"></ion-icon>
-          <ion-input
-            formControlName="title"
-            placeholder="Ex : Clairière aux étoiles"
-            class="clean-input">
-          </ion-input>
-        </div>
-      </div>
-
-      <div class="field-group">
-        <label class="field-label">
-          Description
-          <span class="badge-required">Requis</span>
-        </label>
-        <div class="input-box textarea-box">
-          <ion-textarea
-            formControlName="description"
-            placeholder="Décris l'accès, l'ambiance, les conseils… plus c'est détaillé, mieux c'est !"
-            rows="4"
-            class="clean-input">
-          </ion-textarea>
-        </div>
-      </div>
-
-    </div>
-    <div class="section-card">
-      <div class="section-label">
-        <div class="label-icon-wrap">
-          <ion-icon name="camera-outline"></ion-icon>
-        </div>
-        <span>Photos du spot</span>
-      </div>
-
-      @if (imagesUrl.length > 0) {
-        <div class="preview-gallery-grid">
-
-          @for (imgUrl of imagesUrl; track imgUrl) {
-            <div class="mini-preview-wrapper">
-              <img [src]="imgUrl" class="mini-preview-img" />
-              <button type="button" class="delete-img-btn" (click)="removePhoto(imgUrl, $event)">
-                <ion-icon name="close-circle"></ion-icon>
-              </button>
-            </div>
-          }
-
-          <div class="mini-upload-btn" (click)="takePhoto()">
-            <ion-icon name="add-outline"></ion-icon>
-            <span>Ajouter</span>
-          </div>
-
-        </div>
-      }
-      @else {
-        <div class="upload-placeholder" (click)="takePhoto()">
-          <div class="upload-circle">
-            <ion-icon name="image-outline"></ion-icon>
-          </div>
-          <p class="upload-text">Ajouter une photo du bivouac</p>
-          <p class="upload-sub">Appareil photo ou galerie</p>
-        </div>
-      }
-    </div>
-
-    <div class="section-card">
-      <div class="section-label">
-        <div class="label-icon-wrap">
-          <ion-icon name="home-outline"></ion-icon>
-        </div>
-        <span>Type d'hébergement</span>
-      </div>
-      <div class="chips-grid">
-        @for (item of allLodging; track item.id) {
-          <div [class.selected]="isLodgingSelected(item.id)"
-               (click)="selectLodging(item.id)"
-               class="type-chip">
-            <div class="chip-icon-wrap">
-              <ion-icon [name]="item.icon"></ion-icon>
-            </div>
-            <span class="chip-label">{{ item.label }}</span>
+      <div class="step-dots">
+        @for (step of steps; track step.id) {
+          <div class="step-dot"
+               [class.done]="step.id < currentStep"
+               [class.active]="step.id === currentStep"
+               (click)="goToStep(step.id)">
           </div>
         }
       </div>
+
+      <div class="step-heading">
+        <h1 class="step-title">{{ currentStepInfo.title }}</h1>
+        <p class="step-subtitle">{{ currentStepInfo.subtitle }}</p>
+      </div>
     </div>
 
-    <div class="section-card">
-      <div class="section-label">
-        <div class="label-icon-wrap">
-          <ion-icon name="options-outline"></ion-icon>
-        </div>
-        <span>Options</span>
-      </div>
+    <!-- ============ CORPS : les écrans qui glissent ============ -->
+    <div class="wizard-track" [style.transform]="'translateX(-' + (currentStep - 1) * (100 / totalSteps) + '%)'" [style.width.%]="totalSteps * 100">
 
-      <div class="toggle-row">
-        <div class="toggle-info">
-          <div class="toggle-icon-wrap">
-            <ion-icon name="train-outline"></ion-icon>
+      <!-- ÉCRAN 1 — LOCALISATION -->
+      <div class="wizard-panel" [style.width.%]="100 / totalSteps">
+        <div class="panel-scroll">
+          <div class="map-wrapper">
+            <div id="map-publish"></div>
+            <button type="button" class="gps-pill" (click)="getCurrentLocation()">
+              <ion-icon name="locate-outline"></ion-icon>
+              Me géolocaliser
+            </button>
           </div>
-          <div>
-            <p class="toggle-title">Accessible en train</p>
-            <p class="toggle-sub">Gare ou arrêt à proximité</p>
+          <div class="input-box search-box">
+            <ion-icon name="search-outline" class="input-icon"></ion-icon>
+            <ion-input
+              formControlName="search"
+              placeholder="Ex : Mont Blanc"
+              class="clean-input">
+            </ion-input>
           </div>
-        </div>
-        <ion-toggle formControlName="accessibleByTrain" class="custom-toggle"></ion-toggle>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="toggle-row">
-        <div class="toggle-info">
-          <div class="toggle-info">
-            <div class="toggle-icon-wrap">
-              <ion-icon name="cash-outline"></ion-icon>
+          @if (searchResults.length>0){
+            <div class="search-result">
+              @for (searchResult of searchResults ; track searchResult){
+                <div class="search-result-item" (click)="selectResult(searchResult)">
+                  <span class="result-name">{{ searchResult.display_name.split(',')[0] }}</span>
+                  <span class="result-location">{{ searchResult.display_name.split(',')[1] }}, {{ searchResult.display_name.split(',')[2] }}</span>
+                </div>
+              }
             </div>
-            <div>
-              <p class="toggle-title">Accès payant</p>
-              <p class="toggle-sub">Droit d'entrée ou redevance</p>
+          }
+          <p class="panel-hint">Touche la carte ou fais glisser le repère pour ajuster précisément.</p>
+        </div>
+      </div>
+
+      <!-- ÉCRAN 2 — TYPE D'HÉBERGEMENT -->
+      <div class="wizard-panel" [style.width.%]="100 / totalSteps">
+        <div class="panel-scroll">
+          <div class="chips-grid big-chips">
+            @for (item of allLodging; track item.id) {
+              <div [class.selected]="isLodgingSelected(item.id)"
+                   (click)="selectLodging(item.id)"
+                   class="type-chip">
+                <div class="chip-icon-wrap">
+                  <ion-icon [name]="item.icon"></ion-icon>
+                </div>
+                <span class="chip-label">{{ item.label }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- ÉCRAN 3 — DESCRIPTION -->
+      <div class="wizard-panel" [style.width.%]="100 / totalSteps">
+        <div class="panel-scroll">
+          <div class="field-group">
+            <label class="field-label">
+              Nom du spot
+              <span class="badge-optional">Optionnel</span>
+            </label>
+            <div class="input-box">
+              <ion-icon name="bookmark-outline" class="input-icon"></ion-icon>
+              <ion-input
+                formControlName="title"
+                placeholder="Ex : Clairière aux étoiles"
+                class="clean-input">
+              </ion-input>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">
+              Description
+              <span class="badge-required">Requis</span>
+            </label>
+            <div class="input-box textarea-box">
+              <ion-textarea
+                formControlName="description"
+                placeholder="Décris l'accès, l'ambiance, les conseils… plus c'est détaillé, mieux c'est !"
+                rows="6"
+                class="clean-input">
+              </ion-textarea>
             </div>
           </div>
         </div>
-        <ion-toggle formControlName="isPaid" (ionChange)="onPaidToggleChange($event)" class="custom-toggle"></ion-toggle>
       </div>
 
-      @if (spotForm.get('isPaid')?.value) {
-        <div class="price-reveal">
-          <label class="field-label">Tarif</label>
-          <div class="input-box price-box">
-            <ion-icon name="pricetag-outline" class="input-icon"></ion-icon>
-            <ion-input type="number" formControlName="price" placeholder="0.00" class="clean-input"></ion-input>
-            <span class="currency-tag">€</span>
-          </div>
+      <!-- ÉCRAN 4 — PHOTOS -->
+      <div class="wizard-panel" [style.width.%]="100 / totalSteps">
+        <div class="panel-scroll">
+          @if (imagesUrl.length > 0) {
+            <div class="preview-gallery-grid">
+              @for (imgUrl of imagesUrl; track imgUrl) {
+                <div class="mini-preview-wrapper">
+                  <img [src]="imgUrl" class="mini-preview-img" />
+                  <button type="button" class="delete-img-btn" (click)="removePhoto(imgUrl, $event)">
+                    <ion-icon name="close-circle"></ion-icon>
+                  </button>
+                </div>
+              }
+              <div class="mini-upload-btn" (click)="takePhoto()">
+                <ion-icon name="add-outline"></ion-icon>
+                <span>Ajouter</span>
+              </div>
+            </div>
+          }
+          @else {
+            <div class="upload-placeholder" (click)="takePhoto()">
+              <div class="upload-circle">
+                <ion-icon name="image-outline"></ion-icon>
+              </div>
+              <p class="upload-text">Ajouter une photo du bivouac</p>
+              <p class="upload-sub">Appareil photo ou galerie</p>
+            </div>
+          }
+          <p class="panel-hint">Pas de photo sous la main ? Pas de souci, tu peux publier sans.</p>
         </div>
+      </div>
+
+      <!-- ÉCRAN 5 — CRITÈRES ESSENTIELS -->
+      <div class="wizard-panel" [style.width.%]="100 / totalSteps">
+        <div class="panel-scroll">
+          <div class="field-group">
+            <label class="field-label">Point d'eau</label>
+            <div class="chips-grid">
+              @for (item of allWaterOptions; track item.id) {
+                <div [class.selected]="isFieldValueSelected('water_availability', item.id)"
+                     (click)="selectFieldValue('water_availability', item.id)"
+                     class="type-chip">
+                  <div class="chip-icon-wrap">
+                    <ion-icon [name]="item.icon"></ion-icon>
+                  </div>
+                  <span class="chip-label">{{ item.label }}</span>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Réglementation</label>
+            <div class="chips-grid">
+              @for (item of allLegalOptions; track item.id) {
+                <div [class.selected]="isFieldValueSelected('legal_status', item.id)"
+                     (click)="selectFieldValue('legal_status', item.id)"
+                     class="type-chip">
+                  <div class="chip-icon-wrap">
+                    <ion-icon [name]="item.icon"></ion-icon>
+                  </div>
+                  <span class="chip-label">{{ item.label }}</span>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Nature du sol</label>
+            <div class="chips-grid">
+              @for (item of allGroundOptions; track item.id) {
+                <div [class.selected]="isFieldValueSelected('ground_type', item.id)"
+                     (click)="selectFieldValue('ground_type', item.id)"
+                     class="type-chip">
+                  <div class="chip-icon-wrap">
+                    <ion-icon [name]="item.icon"></ion-icon>
+                  </div>
+                  <span class="chip-label">{{ item.label }}</span>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Réseau mobile</label>
+            <div class="chips-grid">
+              @for (item of allNetworkOptions; track item.id) {
+                <div [class.selected]="isFieldValueSelected('network_coverage', item.id)"
+                     (click)="selectFieldValue('network_coverage', item.id)"
+                     class="type-chip">
+                  <div class="chip-icon-wrap">
+                    <ion-icon [name]="item.icon"></ion-icon>
+                  </div>
+                  <span class="chip-label">{{ item.label }}</span>
+                </div>
+              }
+            </div>
+          </div>
+          <p class="panel-hint">Tu ne sais pas ? Laisse tel quel, ce n'est jamais bloquant.</p>
+        </div>
+      </div>
+
+      <!-- ÉCRAN 6 — SERVICES & OPTIONS -->
+      <div class="wizard-panel" [style.width.%]="100 / totalSteps">
+        <div class="panel-scroll">
+          <div class="field-group">
+            <label class="field-label">Services disponibles</label>
+            <div class="chips-grid">
+              @for (service of allServices; track service.id) {
+                <div [class.selected]="isServiceSelected(service.id)"
+                     (click)="toggleService(service.id)"
+                     class="type-chip service-chip">
+                  <div class="chip-icon-wrap">
+                    <ion-icon [name]="service.icon"></ion-icon>
+                  </div>
+                  <span class="chip-label">{{ service.label }}</span>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="toggle-icon-wrap">
+                <ion-icon name="train-outline"></ion-icon>
+              </div>
+              <div>
+                <p class="toggle-title">Accessible en train</p>
+                <p class="toggle-sub">Gare ou arrêt à proximité</p>
+              </div>
+            </div>
+            <ion-toggle formControlName="accessibleByTrain" class="custom-toggle"></ion-toggle>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="toggle-icon-wrap">
+                <ion-icon name="cash-outline"></ion-icon>
+              </div>
+              <div>
+                <p class="toggle-title">Accès payant</p>
+                <p class="toggle-sub">Droit d'entrée ou redevance</p>
+              </div>
+            </div>
+            <ion-toggle formControlName="isPaid" (ionChange)="onPaidToggleChange($event)" class="custom-toggle"></ion-toggle>
+          </div>
+
+          @if (spotForm.get('isPaid')?.value) {
+            <div class="price-reveal">
+              <label class="field-label">Tarif</label>
+              <div class="input-box price-box">
+                <ion-icon name="pricetag-outline" class="input-icon"></ion-icon>
+                <ion-input type="number" formControlName="price" placeholder="0.00" class="clean-input"></ion-input>
+                <span class="currency-tag">€</span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- ÉCRAN 7 — RÉCAPITULATIF -->
+      <div class="wizard-panel" [style.width.%]="100 / totalSteps">
+        <div class="panel-scroll">
+          <div class="recap-card">
+            @if (imagesUrl.length > 0) {
+              <img [src]="imagesUrl[0]" class="recap-cover" />
+            } @else {
+              <div class="recap-cover recap-cover-empty">
+                <ion-icon name="image-outline"></ion-icon>
+              </div>
+            }
+            <div class="recap-body">
+              <div class="recap-type-badge">
+                <ion-icon [name]="selectedLodgingIcon"></ion-icon>
+                {{ selectedLodgingLabel }}
+              </div>
+              <h2 class="recap-title">{{ displayTitle }}</h2>
+              <p class="recap-description">{{ spotForm.get('description')?.value }}</p>
+
+              @if (selectedServicesLabels.length > 0) {
+                <div class="recap-services">
+                  @for (label of selectedServicesLabels; track label) {
+                    <span class="recap-service-pill">{{ label }}</span>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="recap-list">
+            <div class="recap-list-item" (click)="goToStep(1)">
+              <ion-icon name="location-outline"></ion-icon>
+              <span>Position ajustée sur la carte</span>
+              <ion-icon name="chevron-forward-outline" class="chevron"></ion-icon>
+            </div>
+            <div class="recap-list-item" (click)="goToStep(4)">
+              <ion-icon name="camera-outline"></ion-icon>
+              <span>{{ imagesUrl.length }} photo(s) ajoutée(s)</span>
+              <ion-icon name="chevron-forward-outline" class="chevron"></ion-icon>
+            </div>
+            <div class="recap-list-item" (click)="goToStep(5)">
+              <ion-icon name="shield-checkmark-outline"></ion-icon>
+              <span>Critères essentiels renseignés</span>
+              <ion-icon name="chevron-forward-outline" class="chevron"></ion-icon>
+            </div>
+          </div>
+          <p class="panel-hint">Tout est bon ? Publie et partage ton spot avec la commu !</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============ FOOTER : navigation ============ -->
+    <div class="wizard-footer">
+      @if (currentStep > 1) {
+        <button type="button" class="btn-footer btn-prev" (click)="prevStep()">
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </button>
+      }
+
+      @if (!isLastStep) {
+        <button type="button" class="btn-footer btn-next" (click)="nextStep()">
+          Suivant
+          <ion-icon name="arrow-forward-outline"></ion-icon>
+        </button>
+      } @else {
+        <button type="submit" class="btn-footer btn-publish">
+          <ion-icon name="cloud-upload-outline"></ion-icon>
+          Publier le spot
+        </button>
       }
     </div>
-
-    <div class="section-card">
-      <div class="section-label">
-        <div class="label-icon-wrap">
-          <ion-icon name="shield-checkmark-outline"></ion-icon>
-        </div>
-        <span>Critères essentiels</span>
-      </div>
-      <p class="section-hint">Ce qui compte vraiment en pleine nature : survie et légalité.</p>
-
-      <div class="field-group">
-        <label class="field-label">Point d'eau</label>
-        <div class="chips-grid">
-          @for (item of allWaterOptions; track item.id) {
-            <div [class.selected]="isFieldValueSelected('water_availability', item.id)"
-                 (click)="selectFieldValue('water_availability', item.id)"
-                 class="type-chip">
-              <div class="chip-icon-wrap">
-                <ion-icon [name]="item.icon"></ion-icon>
-              </div>
-              <span class="chip-label">{{ item.label }}</span>
-            </div>
-          }
-        </div>
-      </div>
-
-      <div class="field-group">
-        <label class="field-label">Réglementation</label>
-        <div class="chips-grid">
-          @for (item of allLegalOptions; track item.id) {
-            <div [class.selected]="isFieldValueSelected('legal_status', item.id)"
-                 (click)="selectFieldValue('legal_status', item.id)"
-                 class="type-chip">
-              <div class="chip-icon-wrap">
-                <ion-icon [name]="item.icon"></ion-icon>
-              </div>
-              <span class="chip-label">{{ item.label }}</span>
-            </div>
-          }
-        </div>
-      </div>
-
-      <div class="field-group">
-        <label class="field-label">Nature du sol</label>
-        <div class="chips-grid">
-          @for (item of allGroundOptions; track item.id) {
-            <div [class.selected]="isFieldValueSelected('ground_type', item.id)"
-                 (click)="selectFieldValue('ground_type', item.id)"
-                 class="type-chip">
-              <div class="chip-icon-wrap">
-                <ion-icon [name]="item.icon"></ion-icon>
-              </div>
-              <span class="chip-label">{{ item.label }}</span>
-            </div>
-          }
-        </div>
-      </div>
-
-      <div class="field-group">
-        <label class="field-label">Réseau mobile</label>
-        <div class="chips-grid">
-          @for (item of allNetworkOptions; track item.id) {
-            <div [class.selected]="isFieldValueSelected('network_coverage', item.id)"
-                 (click)="selectFieldValue('network_coverage', item.id)"
-                 class="type-chip">
-              <div class="chip-icon-wrap">
-                <ion-icon [name]="item.icon"></ion-icon>
-              </div>
-              <span class="chip-label">{{ item.label }}</span>
-            </div>
-          }
-        </div>
-      </div>
-    </div>
-
-    <div class="section-card">
-      <div class="section-label">
-        <div class="label-icon-wrap">
-          <ion-icon name="construct-outline"></ion-icon>
-        </div>
-        <span>Services disponibles</span>
-      </div>
-      <div class="chips-grid">
-        @for (service of allServices; track service.id) {
-          <div [class.selected]="isServiceSelected(service.id)"
-               (click)="toggleService(service.id)"
-               class="type-chip service-chip">
-            <div class="chip-icon-wrap">
-              <ion-icon [name]="service.icon"></ion-icon>
-            </div>
-            <span class="chip-label">{{ service.label }}</span>
-          </div>
-        }
-      </div>
-    </div>
-
-    <button type="submit" class="submit-btn">
-      <ion-icon name="cloud-upload-outline"></ion-icon>
-      Publier le spot
-    </button>
 
   </form>
 </ion-content>

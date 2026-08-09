@@ -38,6 +38,23 @@ export class PublishPage implements OnDestroy {
   imagesUrl: String[] =[];
   searchResults:any[] =[];
 
+  // === WIZARD MULTI-ÉCRANS ===
+  // On découpe le gros formulaire en petites étapes digestes,
+  // c'est bien plus léger et engageant pour l'utilisateur qu'un formulaire fleuve.
+  currentStep = 1;
+  readonly steps = [
+    { id: 1, title: 'Où se trouve ton spot ?',      subtitle: 'Place le repère sur la carte',          icon: 'location-outline' },
+    { id: 2, title: "Quel type d'hébergement ?",     subtitle: 'Choisis ce qui décrit le mieux le lieu', icon: 'home-outline' },
+    { id: 3, title: 'Décris ton spot',               subtitle: 'Nom, description et petit(s) conseil(s)', icon: 'create-outline' },
+    { id: 4, title: 'Ajoute une photo',              subtitle: 'Un visuel donne toujours envie (optionnel)', icon: 'camera-outline' },
+    { id: 5, title: 'Critères essentiels',           subtitle: 'Eau, légalité, sol, réseau — si tu sais',  icon: 'shield-checkmark-outline' },
+    { id: 6, title: 'Services & options',            subtitle: 'Ce que tu trouveras sur place',          icon: 'construct-outline' },
+    { id: 7, title: 'Dernier coup d\'œil',           subtitle: 'Vérifie et publie ton spot',             icon: 'checkmark-circle-outline' },
+  ];
+  get totalSteps(): number { return this.steps.length; }
+  get currentStepInfo() { return this.steps[this.currentStep - 1]; }
+  get progressPercent(): number { return (this.currentStep / this.totalSteps) * 100; }
+
   constructor(
     private formBuilder: FormBuilder,
     private spotsService: SpotsService,
@@ -244,6 +261,56 @@ export class PublishPage implements OnDestroy {
     this.spotForm.get('services')?.setValue(currentServices);
   }
 
+  // === NAVIGATION ENTRE ÉCRANS ===
+  nextStep() {
+    if (!this.canLeaveCurrentStep()) return;
+
+    if (this.currentStep < this.totalSteps) {
+      this.currentStep++;
+      this.scrollToTop();
+    }
+  }
+
+  prevStep() {
+    if (this.currentStep > 1) {
+      this.currentStep--;
+      this.scrollToTop();
+    } else {
+      this.goBack();
+    }
+  }
+
+  goToStep(stepId: number) {
+    // On autorise à revenir en arrière librement, mais pas à sauter en avant
+    // au-delà de ce qui a déjà été validé.
+    if (stepId < this.currentStep) {
+      this.currentStep = stepId;
+      this.scrollToTop();
+    }
+  }
+
+  private scrollToTop() {
+    const el = document.querySelector('.wizard-panel.active .panel-scroll');
+    if (el) el.scrollTop = 0;
+  }
+
+  // Petite validation douce, écran par écran, pour ne jamais bloquer
+  // l'utilisateur sans lui dire pourquoi.
+  canLeaveCurrentStep(): boolean {
+    if (this.currentStep === 3) {
+      const description = this.spotForm.get('description')?.value?.trim();
+      if (!description) {
+        this.showToast('Ajoute une petite description pour continuer.', 'warning');
+        return false;
+      }
+    }
+    return true;
+  }
+
+  get isLastStep(): boolean {
+    return this.currentStep === this.totalSteps;
+  }
+
   async onSubmit() {
     if (this.spotForm.invalid) {
       this.showToast('Il manque des informations obligatoires (description ou coordonnées) !', 'warning');
@@ -287,6 +354,7 @@ export class PublishPage implements OnDestroy {
 
       // Reset clean
       this.imagesUrl = []; // On vide aussi la variable locale !
+      this.currentStep = 1;
       this.spotForm = this.formBuilder.group({
         search: [''],  //
         title: [''],
@@ -361,6 +429,28 @@ export class PublishPage implements OnDestroy {
   }
   goBack(){
     this.navCtrl.back();
+  }
+
+  // === HELPERS POUR L'ÉCRAN RÉCAP (étape 7) ===
+  get selectedLodgingLabel(): string {
+    const lodging = this.allLodging.find(l => l.id === this.spotForm.get('type')?.value);
+    return lodging ? lodging.label : 'Non renseigné';
+  }
+
+  get selectedLodgingIcon(): string {
+    const lodging = this.allLodging.find(l => l.id === this.spotForm.get('type')?.value);
+    return lodging ? lodging.icon : 'help-outline';
+  }
+
+  get selectedServicesLabels(): string[] {
+    const ids = this.spotForm.get('services')?.value || [];
+    return this.allServices.filter(s => ids.includes(s.id)).map(s => s.label);
+  }
+
+  get displayTitle(): string {
+    const title = this.spotForm.get('title')?.value?.trim();
+    if (title) return title;
+    return `${this.selectedLodgingLabel} inédit`;
   }
 
   initSearch() {
